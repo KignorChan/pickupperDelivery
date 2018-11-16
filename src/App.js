@@ -16,7 +16,8 @@ class App extends Component{
     render(){
         return(
             <View style={{flex:1}}>
-                <AppNavigator/>
+                <Header headerText='配送单'/> 
+                <BottomNavigatorHome/>
             </View>
 
         );

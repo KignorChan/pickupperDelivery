@@ -41,9 +41,7 @@ class Main extends Component{
             <View style={{flex:1}}>
 
                 <WarnMessageBox style={{}}>Warning!!!!</WarnMessageBox>
-                <View style={{flex: 1}}>
-                    <Text>发送选项</Text>
-                </View>
+
                 <View style={{flex:16, padding:10, backgroundColor:'#F2F2F2'}}>
                     <ScrollView style={{backgroundColor:'#F2F2F2'}}>
                         <DeliveryRequest/>

@@ -4,6 +4,9 @@ import { createBottomTabNavigator } from 'react-navigation';
 import Mainscreen from '../screen/Main';
 import IconFood from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconDelivery from 'react-native-vector-icons/MaterialCommunityIcons';
+import PersonIcon from 'react-native-vector-icons/MaterialIcons';
+import PersonalCenter from '../screen/PersonalCenter';
+import Delivering from '../screen/Delivering';
  
 
 export default createBottomTabNavigator({
@@ -17,11 +20,20 @@ export default createBottomTabNavigator({
         }
     },
     Tracking: {
-        screen: Mainscreen,
+        screen: Delivering,
         navigationOptions:{
             tabBarLabel:'配送中',
             tabBarIcon: ({tintColor})=>(
                 <IconDelivery name="truck-delivery" size={24}/>
+            )
+        }
+    },
+    PersonalInfo: {
+        screen: PersonalCenter,
+        navigationOptions:{
+            tabBarLabel:'个人中心',
+            tabBarIcon: ({tintColor})=>(
+                <PersonIcon name="person" size={24}/>
             )
         }
     }
