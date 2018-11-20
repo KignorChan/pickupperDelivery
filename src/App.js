@@ -6,6 +6,7 @@ import Header from './components/Header';
 import { createDrawerNavigator, DrawerItems } from 'react-navigation';
 import BottomNavigatorHome from './BottomNavigatorHome';
 import Login from '../screen/Login';
+import { Spinner } from './components/Common';
 
 
 const AppNavigator = createDrawerNavigator({
@@ -15,6 +16,8 @@ const AppNavigator = createDrawerNavigator({
   
   
 class App extends Component{
+    state = { loggedIn: null };
+
     componentWillMount(){
         firebase.initializeApp(
             {
@@ -26,19 +29,52 @@ class App extends Component{
                 messagingSenderId: '1046612703196'
               }
         );
+
+        firebase.auth().onAuthStateChanged((user)=>{
+            if(user){
+                this.setState({loggedIn: true});
+            }else{
+                this.setState({loggedIn: false});
+            }
+            
+        });
+    }
+
+    renderContent(){
+        switch(this.state.loggedIn){
+            case true:
+                return(
+                    <View style={{flex:1}}>
+                        <Header headerText='配送单'/> 
+                        <BottomNavigatorHome/>
+                    </View>
+                );
+            case false:
+                return (
+                    <View style={{flex:1}}>
+                        <Login/>
+                    </View>
+                );
+            default: 
+                return (
+                    <View style={{flex:1}}>
+                        <Spinner/>
+                    </View>
+                );
+                    
+                    
+                    
+        }
     }
 
     render(){
-        //return(
-        //     <View style={{flex:1}}>
-        //         <Header headerText='配送单'/> 
-        //         <BottomNavigatorHome/>
-        //     </View>
-
-        // );
-        return (
-            <Login/>
+        return(
+            <View style={{flex:1}}>
+                {this.renderContent()}
+            </View>
         );
+
+
     }
 }
 
@@ -51,40 +87,5 @@ const CustomDrawerComponent = (props)=>{
         </SafeAreaView>
     );
 }
-
-
-  
-
-// class App extends Component{
-
-
-//     render() {
-
-//         network = 0;
-//         display={};
-//         if(network){
-//             display
-//         }
-//         const styles = {
-//             headerStyle:{
-//                 paddingTop: 30,
-//                 flex:1,
-//             }
-//         }
-
-//         return(
-//             <View style={{flex: 1}}>
-//                 <View style={ styles.headerStyle }>
-//                     <Header headerText='配送单'/>   
-//                 </View>
-//                 <View style={{flex: 15}}><Mainscreen/></View>  
-//             </View>
-
-            
-//         );        
-//     }
-// }
-
-
 
 export default App;

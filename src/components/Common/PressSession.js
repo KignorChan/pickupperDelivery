@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 
 
-const PressSession = (props)=>{
+const PressSession = ({onPress, icon, text})=>{
     const {
         sessionStyle,
         iconStyle,
@@ -12,19 +12,17 @@ const PressSession = (props)=>{
     
     
     //imageSource = props.icon;
-    imageSource = props.icon;
-    text=props.text;
 
     return (
-        <View style={sessionStyle}>
+        <TouchableOpacity style={sessionStyle} onPress={onPress}>
             <View style={iconViewStyle}>
-                <Image source={props.icon} style={iconStyle}/>
+                <Image source={icon} style={iconStyle}/>
             </View>
 
             <View style={textViewStyle}>
                 <Text>{text}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }
 

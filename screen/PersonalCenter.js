@@ -1,11 +1,16 @@
 import React, {Component} from 'react';
 import { Text, View, Image } from 'react-native';
+import firebase from 'firebase';
 import { PressSession } from '../src/components/Common';
 import PersonalInfoCard from '../src/components/PersonalInfoCard';
 
 class PersonalCenter extends Component{
     
-    
+    signOut(){
+        console.log('Sign out');
+        firebase.auth().signOut();
+    }
+
     render(){
         
         const styles={
@@ -27,7 +32,11 @@ class PersonalCenter extends Component{
                     <PressSession text='我收到的投诉' icon={require('../img/unhappy.png')}/>
                     <PressSession text='我的罚单' icon={require('../img/moneyoff.png')}/>
                     <PressSession text='账单明细' icon={require('../img/balance.png')}/>    
-                    <PressSession text='设置' icon={require('../img/setting.png')}/>
+                    <PressSession text='设置' icon={require('../img/setting.png')} />
+                </View>
+                <View style={{marginTop:20}}>
+                    <PressSession text='Sign out' icon={require('../img/exit.png')} 
+                    onPress={this.signOut.bind(this)}/>
                 </View>
                 
             </View>

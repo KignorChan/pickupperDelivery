@@ -12,18 +12,40 @@ class Login extends Component{
         passwordConfirm:'',
         loadRegisterPage: null,
         loadErrorMessage: null,
+        loadEmailValidationErrorMessage: null,
+        loadPasswordNotMatchErrorMessage: null,
     };
 
     loginButtonPressed(){
         const { email, password }=this.state;
-        firebase.auth().signInWithEmailAndPassword(email, password).then(
-            ()=>{console.log('Sucessly login')}
-        ).catch(
-            ()=>{
+        if(this.validateEmail(email)){
+            firebase.auth().signInWithEmailAndPassword(email, password).then(
+                ()=>{console.log('Sucessly login')}
+            ).catch(
+                ()=>{
+    
+                    console.log('failed login:'+ email +'  '+ password);
+                    this.setState({loadErrorMessage:true});
+            });
+        }else{
+            this.setState({loadEmailValidationErrorMessage:true});
+        } 
+    }
 
-                console.log('failed login:'+ email +'  '+ password);
-                this.setState({loadErrorMessage:true});
-        });
+    renderEmailValidationErrorMessage(){
+        if(this.state.loadEmailValidationErrorMessage){
+            return (
+                <OnPressText text='邮箱根式错误，请重新输入！' onPress={this.findPassword.bind(this)}/>
+            );
+        }
+    }
+
+    renderPasswordNotMatchErrorMessage(){
+        if(this.state.loadPasswordNotMatchErrorMessage){
+            return (
+                <OnPressText text='密码不一致，请重新输入！' onPress={this.findPassword.bind(this)}/>
+            );
+        }
     }
 
     loadRegisterPage(){
@@ -52,8 +74,58 @@ class Login extends Component{
             email:'',
             password:'',
             passwordConfirm:'',
+            loadErrorMessage: null
         });
         this.setState({loadRegisterPage: null});
+    }
+
+    createUserButton(){
+        if(this.matchPassword()){
+            const { email, password }=this.state;
+            firebase.auth().createUserWithEmailAndPassword(email, password).then(
+                ()=>{
+                    console.log('Sucessfully regist!');
+                }
+            ).catch(
+                ()=>{
+                    console.log('Fail to  regist!');
+                }
+            );
+        }else{
+            this.setState({loadPasswordNotMatchErrorMessage: true});
+        }
+
+
+
+        
+
+    }
+
+    validateEmail(text){
+        console.log(text);
+        let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ ;
+        if(reg.test(text) === false)
+        {
+            console.log("Email is Not Correct");
+            //this.setState({email:text})
+            return false;
+        }
+        else {
+            //this.setState({email:text})
+            console.log("Email is Correct");
+            return true;
+        }
+    }
+
+    matchPassword(){
+        const {password, passwordConfirm}=this.state;
+        if(password==passwordConfirm){
+            console.log('password match!!');
+            return true;
+        }else{
+            console.log('password not match!!');
+            return false;
+        }
     }
 
     renderLogin(){
@@ -70,17 +142,18 @@ class Login extends Component{
                 autoFocus= {true}
                 placeHolder='请输入用户名' 
                 value={this.state.email}
-                onChangeText={(email) => this.setState({email})}
+                onChangeText={(email) => this.setState({email:email,loadEmailValidationErrorMessage:null, loadErrorMessage:null})}
             />
 
             <Input 
                 placeHolder='请输入密码' 
                 value={this.state.password} 
-                onChangeText={password => this.setState({password})}
+                onChangeText={password => this.setState({password: password,loadErrorMessage:null})}
                 secureTextEntry={true}
             />
             <View>
                 {this.renderErrorMessage()}
+                {this.renderEmailValidationErrorMessage()}
             </View>
             <View style={{ marginTop: 20 }}>
                 <Button text='登陆' onPress={this.loginButtonPressed.bind(this)}/>
@@ -106,15 +179,16 @@ class Login extends Component{
             <Input 
                 placeHolder='请输入密码' 
                 value={this.state.password} 
-                onChangeText={password => this.setState({password})}
+                onChangeText={password => this.setState({password:password, loadPasswordNotMatchErrorMessage:null})}
                 secureTextEntry={true}
             />
             <Input 
                 placeHolder='再次输入密码' 
                 value={this.state.passwordConfirm} 
-                onChangeText={passwordConfirm => this.setState({passwordConfirm})}
+                onChangeText={passwordConfirm => this.setState({passwordConfirm:passwordConfirm, loadPasswordNotMatchErrorMessage:null})}
                 secureTextEntry={true}
             />
+            
             <View style={{ alignItems:'flex-end', justifyContent:'flex-end', flexDirection:'row'}}>
                 <TouchableOpacity style={{
                     backgroundColor: '#fff', 
@@ -132,9 +206,12 @@ class Login extends Component{
                     }}>返回登陆界面</Text>
                 </TouchableOpacity>
             </View>
+            <View>
+                {this.renderPasswordNotMatchErrorMessage()}
+            </View>
             
             <View style={{ marginTop:20 }}>
-                <Button text='注册' onPress={this.loginButtonPressed.bind(this)}/>
+                <Button text='注册' onPress={this.createUserButton.bind(this)}/>
             </View>
             </View>
         );
