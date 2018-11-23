@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, SafeAreaView, ScrollView, Dimensions } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, Dimensions, AsyncStorage } from 'react-native';
 import Mainscreen from '../screen/Main';
 import firebase from 'firebase';
 import Header from './components/Header';
@@ -7,26 +7,28 @@ import { createDrawerNavigator, DrawerItems } from 'react-navigation';
 import BottomNavigatorHome from './BottomNavigatorHome';
 import Login from '../screen/Login';
 import { Spinner } from './components/Common';
+import DataController from '../model/DataController';
+import { AppProvider } from '../model/AppContext';
 
-
-const AppNavigator = createDrawerNavigator({
-    Home: BottomNavigatorHome ,
-    Profile: Mainscreen
-});
-  
-  
 class App extends Component{
-    state = { loggedIn: null };
+    state = { 
+        loggedIn: null,
+        orderNum:'10',
+        id:''
+     };
+
+     orderNmu='';
 
     componentWillMount(){
+
         firebase.initializeApp(
             {
-                apiKey: 'AIzaSyDMCTInU-M97PlNjLhB41Ob2Est2b63oj4',
-                authDomain: 'pickupperdeleverytemp.firebaseapp.com',
-                databaseURL: 'https://pickupperdeleverytemp.firebaseio.com',
-                projectId: 'pickupperdeleverytemp',
-                storageBucket: 'pickupperdeleverytemp.appspot.com',
-                messagingSenderId: '1046612703196'
+                apiKey: "AIzaSyBaBcr9jzqTL4DFidcsDkZ0CcPv1gFfMrE",
+                authDomain: "pickupper-47f2b.firebaseapp.com",
+                databaseURL: "https://pickupper-47f2b.firebaseio.com",
+                projectId: "pickupper-47f2b",
+                storageBucket: "pickupper-47f2b.appspot.com",
+                messagingSenderId: "69350237423"
               }
         );
 
@@ -38,7 +40,55 @@ class App extends Component{
             }
             
         });
+
+        firebase.database().ref('orders/').once('value', snap=>{
+            console.log(JSON.stringify(snap.val()))                     //json in string
+            var object = JSON.parse(JSON.stringify(snap.val()));        //parse to json object
+            console.log(Object.keys(object)[0]);
+            var length = Object.keys(object).length;
+            //alert(length);
+            this.setState({orderNum: length});
+            //this.orderNmu = length;
+            DataController.orderNum = length;
+        })        
+
+
+
+        DataController.parseTimeStamp(1540266506125);
+
+        firebase.database()
+        .ref('/orders/')
+        .on('value', snapshot => {
+            const id = snapshot.key;
+            var temp = JSON.stringify(snapshot.val());
+            // console.log('Aaaaaaa: '+ temp);
+            //this._storeData('newOrderData',temp);
+
+            
+            //alert(id);
+
+            //----------OR----------//
+            const data = snapshot.val() || null;
+            if (data) {
+              const orderNum = Object.keys(data).length;
+              //alert(id);
+              this.setState({orderNum});
+            
+              
+            }
+        });
+        //alert(this.state.id);
+
+        
     }
+    
+    // _storeData = async (key, value) => {
+    //     try {
+    //       await AsyncStorage.setItem(key, value);
+    //     } catch (error) {
+    //       // Error saving data
+    //     }
+    //   }
 
     renderContent(){
         switch(this.state.loggedIn){
@@ -67,25 +117,25 @@ class App extends Component{
         }
     }
 
-    render(){
+    render(){ 
         return(
-            <View style={{flex:1}}>
-                {this.renderContent()}
-            </View>
+            <AppProvider>
+                <View style={{flex:1}}>
+                    {this.renderContent()}
+                </View>   
+            </AppProvider>
+                
+                
+         
+                  
+            
+
         );
-
-
     }
 }
 
-const CustomDrawerComponent = (props)=>{
-    return (
-        <SafeAreaView style={{ flex:1 }}>
-            <ScrollView>
-                <DrawerItems {...props} />
-            </ScrollView>
-        </SafeAreaView>
-    );
-}
-
 export default App;
+
+
+
+
