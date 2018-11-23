@@ -10,51 +10,80 @@ export const AppConsumer = AppContext.Consumer;
 
 
 export class AppProvider extends React.Component{
-    componentWillMount(){
-        firebase.database()
-        .ref('/orders/')
-        .on('value', snapshot => {
-            const id = snapshot.key;
-            var temp = JSON.stringify(snapshot.val());
-            // console.log('Aaaaaaa: '+ temp);
-            //this._storeData('newOrderData',temp);
+    orders = [];
+    //orders = [];
 
-            
-            //alert(id);
-
-            //----------OR----------//
-            const data = snapshot.val() || null;
-            if (data) {
-              const orderNum = Object.keys(data).length;
-              this.setState({orderNumber: orderNum})
-              
-              const keyname = Object.keys(data)[0];
-              alert(keyname);
-              console.log('The value is:  '+data);
-            
-              
-            }
-        });
-
-        firebase.database()
-        .ref('/orders/').children
-
-    }
     constructor(props){
         super(props);
-        this.state = initalState;
+        this.orders = [];
+    }
+
+    addOrderToArray(order){
+            //this.orders.push(order);
+            this.orders.push(order);
+    }
+
+    componentWillMount(){ 
+        getData = (snapshot)=>{
+
+            const dataObject = snapshot.val() || null;
+            
+            if (dataObject) {              
+              const keys = Object.keys(dataObject);
+              
+                for(var i=0; i<keys.length; i++){
+                    //console.log('Keys['+i+']: '+keys[i]);
+                    var key = keys[i];
+                    
+                    var orderSubObject = dataObject[key];
+                    
+                    var orderSubObjectKeys = Object.keys(orderSubObject);
+
+                    for(var k=0; k<orderSubObjectKeys.length ; k++){
+                        var subKey = orderSubObjectKeys[k];
+                        console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
+                        console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
+                        var orderStatus = orderSubObject[subKey].status;
+
+                        //order status: 
+                        if(orderStatus != null && orderStatus != ''){
+                            if(orderStatus == 'completed'){
+                                var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
+                                console.log('orderSubObjectInJson'+orderSubObjectInJson);
+                               
+                                var order={
+                                        orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
+                                        orderDetail: JSON.parse(orderSubObjectInJson),
+                                    }
+                            
+                                this.addOrderToArray(order);
+
+                                //alert(this.state.orders.length);
+                                //console.log('Testtttt: '+this.orders[0].orderDetail.deliveryFee);
+                                
+                            }
+                        }
+                    }
+                }         
+            }
+        }
+
+        getError = err =>{
+            console.log(err);
+        }
+
+        firebase.database()
+        .ref('/orders/')
+        .on('value', getData, getError);
 
     }
 
-    setOrderNumber(orderNumber){
-        this.setState({orderNumber})
-    }
+
 
     render(){
         return(
             <AppContext.Provider value={{
-                orderNumber: this.state.orderNumber,
-                setOrderNumber: this.setOrderNumber,
+                orders: JSON.stringify(this.orders)
             }}>
                 {this.props.children}
             </AppContext.Provider>

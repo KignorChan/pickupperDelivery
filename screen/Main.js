@@ -8,6 +8,8 @@ import { AppConsumer } from '../model/AppContext';
 
 
 class Main extends Component{
+
+
     constructor(props){
         super(props);
 
@@ -19,6 +21,8 @@ class Main extends Component{
             error: null,
             refreshing: false,
             displayNetworkError:false,
+
+            orders: []
         };
     }
 
@@ -37,42 +41,27 @@ class Main extends Component{
         }
     }
 
+    //Render Entire order list
     renderOrderList(value){
+
+        alert(JSON.parse(value.orders).length);
+
+        // return JSON.parse(value.orders).map(order=>{
+        //     <Text>{order.orderSubObjectInJson}</Text>
+        // });
+
         return (
             <View>
-                <Text>{value.orderNumber}</Text>
+                <Text>{JSON.parse(value.orders).length}</Text>
                 <DeliveryRequest/>
             </View>
         );
     }
-    // renderOrderList(value){
-    //     for(var i =0; i<value.orderNumber; i++){
-    //         this.renderOrder(value);
-    //     }
 
-    // }
-    // renderOrderList = value=>{
-    //     var temp = '';
-    //     for(var i =0; i<value.orderNumber; i++){
-    //         temp += this.renderOrder(value);
-    //     }
-    //     return temp;
-    // }
+    //render single order
+    renderOrder(order){
 
-    // _retrieveData = async () => {
-    //     try {
-    //       const value = await AsyncStorage.getItem('newOrderData');
-    //       if (value !== null) {
-    //         // We have data!!
-    //         console.log('Aaaaaaa: '+ value);
-
-    //       }
-    //      } catch (error) {
-    //        // Error retrieving data
-    //      }
-    //   }
-
-
+    }
 
     render() {
 
@@ -88,8 +77,8 @@ class Main extends Component{
         return(
             <AppConsumer>
             {(value)=>(
+                
                 <View style={{flex:1}}>
-                    <Text>{value.trye}</Text>
                     {this.renderNetworkError()}
 
                     <View style={{flex:16, padding:10, backgroundColor:'#F2F2F2'}}>
@@ -106,6 +95,15 @@ class Main extends Component{
         );        
     }
 }
+
+
+// const WithContext = (Component) => {
+//   return (props) => (
+//       <CustomContext.Consumer>
+//            {value =>  <Component {...props} value={value} />}
+//       </CustomContext.Consumer>
+//   )
+// }
 
 
 
