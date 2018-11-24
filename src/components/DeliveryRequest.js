@@ -1,67 +1,141 @@
 import React from 'react';
 import { Text, View, Image } from 'react-native';
 import { Address, RoundSquare, Button } from './DeliveryRequestComponents';
+import firebase from 'firebase';
+import DataController from '../../model/DataController';
+
+class DeliveryRequest extends React.Component{
+    order = null;
+    orderDetail = null;
+    state={
+        orderPathInFirebase:'',
+        businessAddress:'',
+        businessName: '',
+        deliveryFee:'',
+        timestamp:'',
+        orderFee:'',
+
+    }
 
 
-const DeliveryRequest = ()=>{
-    const {
-        requestViewStyle,
-        circleRed,
-        circleBlue,
-        circleGreen,
-        circleTextstyle,
-        distanceView,
-        horizontalArrangement,
-        requestPriceView,
-        firstLineStyle,
-        remarksViewStyle,
-        remarksTextStyle
-    } = styles;
+    constructor(props){
+        super(props);  
+    }
 
-    return (
-        <View style={requestViewStyle}>
-            
-            <View style={firstLineStyle}>
-                <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
-                <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
-                <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
-                <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
-                <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
-                <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$7</Text></View>
-            </View>
+    componentWillMount(){
+        console.log('zzzzzzzz'+this.props.orderPathInFirebase);
+        this.setState({orderPathInFirebase: this.props.orderPathInFirebase});
 
-            <View style={horizontalArrangement}>
-                <View style={{flex: 1}}>
-                    <Address target='From' tag='取:'>115 Sherper Avenue East, Scarborou, ON M1P5B4 </Address>
-                    <Address target='To' tag='送:'>630 Marham Road, scarborough, ON, M1D2G3 </Address>
-                    <View style={horizontalArrangement}>
-                        <RoundSquare>在线支付5.0元</RoundSquare>
-                        <RoundSquare>顾客下单时间：13:47</RoundSquare>
+        this.order = JSON.parse(this.props.value);
+        this.orderDetail= this.order.orderDetail;
+
+        console.log('qqqqqq'+this.order.orderPathInFirebase);
+
+        var storeId = this.orderDetail.storeUid;
+        
+
+        firebase.database()
+        .ref('stores/'+storeId)
+        .on('value',snapshot=>{
+            var store = snapshot.val();
+            this.setState({
+                businessAddress:store.address,
+                businessName:store.business_name
+            });
+        });
+
+        firebase.database()
+        .ref(this.props.orderPathInFirebase)
+        .on('value',snapshot=>{
+            var order = snapshot.val();
+            this.setState({
+                deliveryFee:order.deliveryFee,
+                timestamp: order.timestamp,
+                orderFee: order.sum,
+            });
+        });
+
+
+
+        
+    }
+
+    submitGetDelivery(){
+        alert(this.state.orderPathInFirebase);
+        firebase.database()
+        .ref(this.props.orderPathInFirebase)
+        .update({
+            status:'completed',
+            courier:'001',
+        });
+    }
+
+    render(){
+    var timestamp = DataController.parseTimeStamp(this.state.timestamp);
+    console.log(timestamp);
+    var orderTime = timestamp[0]+'/'+timestamp[1]+'/'+timestamp[2]+' '+timestamp[3]+':'+timestamp[4]+':'+timestamp[5];
+        
+        const {
+            requestViewStyle,
+            circleRed,
+            circleBlue,
+            circleGreen,
+            circleTextstyle,
+            distanceView,
+            horizontalArrangement,
+            requestPriceView,
+            firstLineStyle,
+            remarksViewStyle,
+            remarksTextStyle
+        } = styles;
+
+        return (
+            <View style={requestViewStyle}>
+                
+                <View style={firstLineStyle}>
+                    <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
+                    <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
+                    <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
+                    <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
+                    <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
+                    <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$ {this.state.deliveryFee}</Text></View>
+                </View>
+    
+                <View style={horizontalArrangement}>
+                    <View style={{flex: 1}}>
+                        <Address target='From' tag='店名：'>{this.state.businessName}</Address>
+                        <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
+                        <Address target='To' tag='送:'>630 Marham Road, scarborough, ON, M1D2G3 </Address>
+                        <View style={horizontalArrangement}>
+                            <RoundSquare>订单价格:{this.state.orderFee}元</RoundSquare>
+                            <RoundSquare>下单时间：{orderTime}</RoundSquare>
+                        </View>
+                        <View style={remarksViewStyle}>
+                            <Text style={remarksTextStyle}>备注：</Text>
+                        </View>
                     </View>
-                    <View style={remarksViewStyle}>
-                        <Text style={remarksTextStyle}>备注：</Text>
+                    <View style={{
+                            justifyContent:'center'
+                        }}>
+                        <Image
+                            source={require('../../img/nextArrow.png')}
+                            style={{
+                                width:20,
+                                height: 20
+                            }}
+                        />
                     </View>
                 </View>
-                <View style={{
-                        justifyContent:'center'
-                    }}>
-                    <Image
-                        source={require('../../img/nextArrow.png')}
-                        style={{
-                            width:20,
-                            height: 20
-                        }}
-                    />
+                
+    
+                <View>
+                    <Button text='取单' onPress={this.submitGetDelivery.bind(this)}/>
                 </View>
             </View>
-            
-
-            <View>
-                <Button text='取单'/>
-            </View>
-        </View>
-    );
+        );
+    }
 }
+
 
 const styles = {
     requestViewStyle:{

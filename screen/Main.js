@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, FlatList, ScrollView, AsyncStorage } from 'react-native';
+import firebase from 'firebase';
 import WarnMessageBox from '../src/components/WarnMessageBox';
 import DeliveryRequest from '../src/components/DeliveryRequest'; 
 import { createBottomTabNavigator } from 'react-navigation';
@@ -8,7 +9,7 @@ import { AppConsumer } from '../model/AppContext';
 
 
 class Main extends Component{
-
+    orders = [];
 
     constructor(props){
         super(props);
@@ -26,8 +27,73 @@ class Main extends Component{
         };
     }
 
+    addOrderToArray(order){
+        //this.orders.push(order);
+        this.orders.push(order);
+    }
+
+componentWillMount(){ 
+    getData = (snapshot)=>{
+
+        const dataObject = snapshot.val() || null;
+        
+        if (dataObject) {              
+          const keys = Object.keys(dataObject);
+          
+            for(var i=0; i<keys.length; i++){
+                //console.log('Keys['+i+']: '+keys[i]);
+                var key = keys[i];
+                
+                var orderSubObject = dataObject[key];
+                
+                var orderSubObjectKeys = Object.keys(orderSubObject);
+
+                for(var k=0; k<orderSubObjectKeys.length ; k++){
+                    var subKey = orderSubObjectKeys[k];
+                    console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
+                    console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
+                    var orderStatus = orderSubObject[subKey].status;
+
+                    //order status: 
+                    if(orderStatus != null && orderStatus != ''){
+                        if(orderStatus == 'progressing'){
+                            var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
+                            console.log('orderSubObjectInJson'+orderSubObjectInJson);
+                           
+                            var order={
+                                    orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
+                                    orderDetail: JSON.parse(orderSubObjectInJson),
+                                }
+                        
+                            this.addOrderToArray(order);
+
+                            //alert(this.state.orders.length);
+                            console.log('Testtttt: '+this.orders[0].orderDetail.deliveryFee);
+                            
+                        }
+                    }
+                }
+            }         
+        }
+    }
+
+    getError = err =>{
+        console.log(err);
+    }
+
+    firebase.database()
+    .ref('/orders/')
+    .on('value', getData, getError);
+
+}
+
     componentDidMount(){
         this.makeRemoteRequest();
+        firebase.database()
+        .ref('/orders/').on('child_added',function(data,prevChildKey){
+            this.orders = data.val();
+        });
+
     }
 
     makeRemoteRequest(){
@@ -42,20 +108,32 @@ class Main extends Component{
     }
 
     //Render Entire order list
-    renderOrderList(value){
+    renderOrderList(orders){
+        console.log('rrrrrrr'+orders[0]);
+        
 
-        alert(JSON.parse(value.orders).length);
+        //let orders = JSON.parse(value);
 
-        // return JSON.parse(value.orders).map(order=>{
-        //     <Text>{order.orderSubObjectInJson}</Text>
-        // });
+        // for(var i=0;i < orders.length;i++ ){
+        //     console.log('Orderzzzzz'+orders[i].orderPathInFirebase);
+        
+        // }
 
-        return (
-            <View>
-                <Text>{JSON.parse(value.orders).length}</Text>
-                <DeliveryRequest/>
-            </View>
-        );
+        // return (()=>{
+        //     for(var i=0;i < orders.length;i++ ){
+        //         console.log('Orderzzzzz'+orders[i].orderPathInFirebase);
+                
+        //         <View>
+
+        //             <DeliveryRequest value={JSON.stringify(orders[i])}/>
+        //         </View>
+        //     }
+        // }
+        // );
+
+        return orders.map(order=>
+            <DeliveryRequest key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} />
+        )
     }
 
     //render single order
@@ -83,7 +161,7 @@ class Main extends Component{
 
                     <View style={{flex:16, padding:10, backgroundColor:'#F2F2F2'}}>
                         <ScrollView style={{backgroundColor:'#F2F2F2'}}>
-                            {this.renderOrderList(value)}
+                            {this.renderOrderList(this.orders)}
                         </ScrollView>
                     </View>
 
@@ -95,15 +173,6 @@ class Main extends Component{
         );        
     }
 }
-
-
-// const WithContext = (Component) => {
-//   return (props) => (
-//       <CustomContext.Consumer>
-//            {value =>  <Component {...props} value={value} />}
-//       </CustomContext.Consumer>
-//   )
-// }
 
 
 

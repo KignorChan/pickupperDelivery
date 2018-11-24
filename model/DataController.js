@@ -22,7 +22,7 @@ export default class DataController{
 
     static parseTimeStamp(timestamp){
         //convert timestamp to readable time
-        var timestamp = 1540266506125;
+        //var timestamp = 1540266506125;
         date = new Date(timestamp);
         datevalues = [
             date.getFullYear(),
@@ -32,6 +32,7 @@ export default class DataController{
             date.getMinutes(),
             date.getSeconds(),
         ];
+        return datevalues;
     }
 
     static asyncOrders(){
