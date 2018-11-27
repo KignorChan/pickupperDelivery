@@ -11,6 +11,7 @@ const ds = new ListView.DataSource({rowHasChanged: (r1,r2)=>r1!=r2});
 
 class Main extends Component{
     orders = [];
+    //keysArray = [];
 
     constructor(props){
         super(props);
@@ -23,18 +24,20 @@ class Main extends Component{
             error: null,
             refreshing: false,
             displayNetworkError:false,
+            
 
             orders: [],
-            dataSource: ds.cloneWithRows([]),
         };
     }
 
     addOrderToArray(order){
         //this.orders.push(order);
+        
         this.orders.push(order);
     }
 
     componentWillMount(){ 
+        this.orders = [];
         getData = (snapshot)=>{
 
             const dataObject = snapshot.val() || null;
@@ -72,6 +75,7 @@ class Main extends Component{
                                 //alert(this.state.orders.length);
                                 console.log('Testttttaaaa: '+this.orders[0].orderDetail.deliveryFee);
                                 console.log('fffff'+this.orders[0].orderDetail.status);
+                                
                                 this.setState({
                                     orders: this.orders
                                 })
@@ -109,16 +113,31 @@ class Main extends Component{
 
     //Render Entire order list
     renderOrderList(value){
+        var keysArray = [];
 
-        return this.state.orders.map(order=>{
-            return (
-                <DeliveryRequest 
-                    key={order.orderPathInFirebase} 
-                    value={JSON.stringify(order)} 
-                    orderPathInFirebase={order.orderPathInFirebase} 
-                />
-                        
-            );
+
+        return this.state.orders.map(order=>{            
+            if(!keysArray.includes(order.orderPathInFirebase)){
+                keysArray.push(order.orderPathInFirebase);
+                console.log('fdsdfsd'+order.orderPathInFirebase);
+                //alert(order.orderPathInFirebase)
+                
+                // if(order.orderDetail.status == 'progressing'){
+                //     alert('Receive an order!');
+                // }
+                return (
+                    <DeliveryRequest 
+                        key={order.orderPathInFirebase} 
+                        value={JSON.stringify(order)} 
+                        orderPathInFirebase={order.orderPathInFirebase} 
+                    />
+                            
+                );
+            }
+            //    
+                
+           // }
+            
         }    
         )
     }

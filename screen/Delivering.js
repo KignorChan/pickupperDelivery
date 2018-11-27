@@ -108,16 +108,19 @@ class Delivering extends Component{
     }
 
     renderDeliveryCards(orders){
-        //var orders = this.orders;
-        console.log('Testttttaaaa: '+this.state.orders);
+        var keysArray = [];
 
+        return this.state.orders.map(order=>{
+            if(!keysArray.includes(order.orderPathInFirebase)){
+                keysArray.push(order.orderPathInFirebase);
+                console.log('fdsdfsd'+order.orderPathInFirebase);
+               // alert(order.orderPathInFirebase)
 
-        return this.state.orders.map(order=>(
-            // <DeliveryRequest key={order.orderDetail.status} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} />
-            <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase}/>
-        )
-        );
-
+                return (            
+                    <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase}/>
+                );
+            }
+        });
     }
     
     

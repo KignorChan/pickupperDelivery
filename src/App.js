@@ -9,6 +9,7 @@ import Login from '../screen/Login';
 import { Spinner } from './components/Common';
 import DataController from '../model/DataController';
 import { AppProvider } from '../model/AppContext';
+import OrderDetail from '../screen/OrderDetail';
 
 class App extends Component{
     state = { 
@@ -142,6 +143,7 @@ class App extends Component{
                     {this.renderContent()}
                 </View>   
             </AppProvider>
+            //<OrderDetail/>
                 
                 
          

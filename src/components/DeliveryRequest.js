@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, Image, Alert } from 'react-native';
 import { Address, RoundSquare, Button } from './DeliveryRequestComponents';
 import firebase from 'firebase';
+import geolib from 'geolib';
 import DataController from '../../model/DataController';
 import { AppConsumer } from '../../model/AppContext'
 
@@ -16,6 +17,13 @@ class DeliveryRequest extends React.Component{
         timestamp:'',
         orderFee:'',
         customAddress:'',
+        
+        userPosition:null,
+
+        businessCoord: {latitude: 0, longitude: 0},
+        userCurrentCoord:{latitude: 0, longitude: 0},
+        meToBusinessDistance:0,
+        businessToCustomerDistance:0,
 
     }
 
@@ -25,6 +33,9 @@ class DeliveryRequest extends React.Component{
     }
 
     componentWillMount(){
+        this.getCurrentUserPosition();
+        //alert(DataController.parseTimeStamp(1543191201422.728));
+
         //console.log('zzzzzzzz'+this.props.orderPathInFirebase);
         this.setState({orderPathInFirebase: this.props.orderPathInFirebase});
 
@@ -46,7 +57,11 @@ class DeliveryRequest extends React.Component{
             var store = snapshot.val();
             this.setState({
                 businessAddress:store.address,
-                businessName:store.business_name
+                businessName:store.business_name,
+                businessCoord:{
+                    latitude: store.latitude ,
+                    longitude: store.longitude,
+                }
             });
         });
 
@@ -59,12 +74,31 @@ class DeliveryRequest extends React.Component{
                 timestamp: order.timestamp,
                 orderFee: order.sum,
             });
-        });
-
-
-
-        
+        }); 
     }
+
+    //handle some geo calculate
+    getCurrentUserPosition(){
+        navigator.geolocation.getCurrentPosition(
+            (position)=>{
+                console.log('Position'+JSON.stringify(position));
+                this.setState({
+                    userPosition: position,
+                    userCurrentCoord: position.coords,
+                });
+                
+            }
+            ,
+            (error)=>{console.log(error);}
+            ,
+            {
+                enableHighAccuracy:true,
+            }
+        );
+
+    }
+
+
 
     submitGetDelivery(uid){
         //alert(this.state.orderPathInFirebase);
@@ -81,10 +115,29 @@ class DeliveryRequest extends React.Component{
                     status:'delivering',
                     courierId: uid,
                 });
+                this.setState({              /////////
+                    status:'delivering',
+                });
+                this.forceUpdate();
               }},
             ],
             { cancelable: false }
           )
+    }
+
+    meToBusinessDistance(){
+        var distance = geolib.getDistance(
+                            {latitude:43.77173745, longitude: -79.26133264244683},
+                            this.state.businessCoord
+                        )
+
+        var distanceInKm = distance/1000;
+        distanceInKm = distanceInKm.toFixed(1);
+        
+        return (
+            <Text>{distanceInKm+' km'}</Text>
+        );
+
     }
 
     render(){
@@ -92,6 +145,8 @@ class DeliveryRequest extends React.Component{
     console.log(timestamp);
     var orderTime = timestamp[0]+'/'+timestamp[1]+'/'+timestamp[2]+' '+timestamp[3]+':'+timestamp[4]+':'+timestamp[5];
         
+    
+
         const {
             requestViewStyle,
             circleRed,
@@ -105,59 +160,61 @@ class DeliveryRequest extends React.Component{
             remarksViewStyle,
             remarksTextStyle
         } = styles;
-
-        return (
-            <AppConsumer>
-            {(value)=>(
-                <View style={requestViewStyle}>
-                    
-                    <View style={firstLineStyle}>
-                        <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
-                        <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
-                        <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
-                        <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
-                        <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
-                        <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$ {this.state.deliveryFee}</Text></View>
-                    </View>
-        
-                    <View style={horizontalArrangement}>
-                        <View style={{flex: 1}}>
-                            <Address target='From' tag='店名：'>{this.state.businessName}</Address>
-                            <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
-                            <Address target='To' tag='送:'>{this.state.customAddress}</Address>
-                            <View style={horizontalArrangement}>
-                                <RoundSquare>订单价格:{this.state.orderFee}元</RoundSquare>
-                                <RoundSquare>下单时间：{orderTime}</RoundSquare>
-                            </View>
-                            <View style={remarksViewStyle}>
-                                <Text style={remarksTextStyle}>备注：</Text>
-                            </View>
+        if(this.state.status == 'delivering'){
+            return (null);
+        }else{
+            return (
+                <AppConsumer>
+                {(value)=>(
+                    <View style={requestViewStyle}>
+                        
+                        <View style={firstLineStyle}>
+                            <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
+                            <View style={distanceView}><Text style={distanceView.textStyle}>{this.meToBusinessDistance()}</Text></View>
+                            <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
+                            <View style={distanceView}><Text style={distanceView.textStyle}>{this.state.businessToCustomerDistance}</Text></View>
+                            <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
+                            <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$ {this.state.deliveryFee}</Text></View>
                         </View>
-                        <View style={{
-                                justifyContent:'center'
-                            }}>
-                            <Image
-                                source={require('../../img/nextArrow.png')}
-                                style={{
-                                    width:20,
-                                    height: 20
-                                }}
-                            />
-                        </View>
-                    </View>
-                    
-        
-                    <View>
-                        <Button text='取单' onPress={this.submitGetDelivery.bind(this, value.userId)}/>
-                    </View>
-                </View>
-            )}
-            </AppConsumer>
-
-
-
             
-        );
+                        <View style={horizontalArrangement}>
+                            <View style={{flex: 1}}>
+                                <Address target='From' tag='店名：'>{this.state.businessName}</Address>
+                                <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
+                                <Address target='To' tag='送:'>{this.state.customAddress}</Address>
+                                <View style={horizontalArrangement}>
+                                    <RoundSquare>订单价格:{this.state.orderFee}元</RoundSquare>
+                                    <RoundSquare>下单时间：{orderTime}</RoundSquare>
+                                </View>
+                                <View style={remarksViewStyle}>
+                                    <Text style={remarksTextStyle}>备注：</Text>
+                                </View>
+                            </View>
+                            <View style={{
+                                    justifyContent:'center'
+                                }}>
+                                <Image
+                                    source={require('../../img/nextArrow.png')}
+                                    style={{
+                                        width:20,
+                                        height: 20
+                                    }}
+                                />
+                            </View>
+                        </View>
+                        
+            
+                        <View>
+                            <Button text='取单' onPress={this.submitGetDelivery.bind(this, value.userId)}/>
+                        </View>
+                    </View>
+                )}
+                </AppConsumer>
+                
+            );
+        }
+
+        
     }
 }
 
@@ -206,7 +263,7 @@ const styles = {
     distanceView:{
         justifyContent: 'center',
         alignItems: 'center',
-        width: 50,
+        width: 70,
         height:30,
         marginLeft: 5,
         textStyle:{
@@ -220,13 +277,12 @@ const styles = {
     },
     requestPriceView:{
         justifyContent: 'center',
-        alignItems: 'center',
-        marginLeft: 60,
+        marginLeft: 10,
         padding:10,
         paddingRight: 10,
         borderLeftWidth: 2,
         borderColor:'#d9d9d9',
-        width:100,
+        width:70,
         height:40,
         textStyle:{
             fontStyle: 'normal',
