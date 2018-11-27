@@ -11,13 +11,14 @@ const Header = (props)=>{
 
 const styles = {
     headerText:{
-        fontSize: 22,
-        fontWeight: 'bold'
+        fontSize: 18,
+        fontWeight: 'bold',
+        color:'#fff'
     },
     headerView:{
         backgroundColor: '#0080ff',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         height: 78,
         shadowColor: '#000',
         shadowOffset: { width:0, height:2 },
@@ -25,6 +26,7 @@ const styles = {
         shadowRadius: 2,
         elevation: 1,
         paddingTop: 30,
+        paddingLeft: 30,
     }
 
 };

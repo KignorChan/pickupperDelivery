@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, ScrollView, AsyncStorage } from 'react-native';
+import { View, Text, FlatList, ScrollView, AsyncStorage, ListView } from 'react-native';
 import firebase from 'firebase';
 import WarnMessageBox from '../src/components/WarnMessageBox';
 import DeliveryRequest from '../src/components/DeliveryRequest'; 
@@ -7,6 +7,7 @@ import { createBottomTabNavigator } from 'react-navigation';
 import DataController from '../model/DataController';
 import { AppConsumer } from '../model/AppContext';
 
+const ds = new ListView.DataSource({rowHasChanged: (r1,r2)=>r1!=r2});
 
 class Main extends Component{
     orders = [];
@@ -23,7 +24,8 @@ class Main extends Component{
             refreshing: false,
             displayNetworkError:false,
 
-            orders: []
+            orders: [],
+            dataSource: ds.cloneWithRows([]),
         };
     }
 
@@ -32,68 +34,66 @@ class Main extends Component{
         this.orders.push(order);
     }
 
-componentWillMount(){ 
-    getData = (snapshot)=>{
+    componentWillMount(){ 
+        getData = (snapshot)=>{
 
-        const dataObject = snapshot.val() || null;
-        
-        if (dataObject) {              
-          const keys = Object.keys(dataObject);
-          
-            for(var i=0; i<keys.length; i++){
-                //console.log('Keys['+i+']: '+keys[i]);
-                var key = keys[i];
-                
-                var orderSubObject = dataObject[key];
-                
-                var orderSubObjectKeys = Object.keys(orderSubObject);
+            const dataObject = snapshot.val() || null;
+            
+            if (dataObject) {              
+            const keys = Object.keys(dataObject);
+            
+                for(var i=0; i<keys.length; i++){
+                    //console.log('Keys['+i+']: '+keys[i]);
+                    var key = keys[i];
+                    
+                    var orderSubObject = dataObject[key];
+                    
+                    var orderSubObjectKeys = Object.keys(orderSubObject);
 
-                for(var k=0; k<orderSubObjectKeys.length ; k++){
-                    var subKey = orderSubObjectKeys[k];
-                    console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
-                    console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
-                    var orderStatus = orderSubObject[subKey].status;
+                    for(var k=0; k<orderSubObjectKeys.length ; k++){
+                        var subKey = orderSubObjectKeys[k];
+                        console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
+                        console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
+                        var orderStatus = orderSubObject[subKey].status;
 
-                    //order status: 
-                    if(orderStatus != null && orderStatus != ''){
-                        if(orderStatus == 'progressing'){
-                            var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
-                            console.log('orderSubObjectInJson'+orderSubObjectInJson);
-                           
-                            var order={
-                                    orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
-                                    orderDetail: JSON.parse(orderSubObjectInJson),
-                                }
-                        
-                            this.addOrderToArray(order);
-
-                            //alert(this.state.orders.length);
-                            console.log('Testtttt: '+this.orders[0].orderDetail.deliveryFee);
+                        //order status: 
+                        if(orderStatus != null && orderStatus != ''){
+                            if(orderStatus == 'progressing'){
+                                var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
+                                console.log('orderSubObjectInJson'+orderSubObjectInJson);
                             
+                                var order={
+                                        orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
+                                        orderDetail: JSON.parse(orderSubObjectInJson),
+                                    }
+                            
+                                this.addOrderToArray(order);
+
+                                //alert(this.state.orders.length);
+                                console.log('Testttttaaaa: '+this.orders[0].orderDetail.deliveryFee);
+                                console.log('fffff'+this.orders[0].orderDetail.status);
+                                this.setState({
+                                    orders: this.orders
+                                })
+                            }
                         }
                     }
-                }
-            }         
+                }         
+            }
         }
+
+        getError = err =>{
+            console.log(err);
+        }
+
+        firebase.database()
+        .ref('/orders/')
+        .on('value', getData, getError);
+
     }
-
-    getError = err =>{
-        console.log(err);
-    }
-
-    firebase.database()
-    .ref('/orders/')
-    .on('value', getData, getError);
-
-}
 
     componentDidMount(){
         this.makeRemoteRequest();
-        firebase.database()
-        .ref('/orders/').on('child_added',function(data,prevChildKey){
-            this.orders = data.val();
-        });
-
     }
 
     makeRemoteRequest(){
@@ -108,31 +108,18 @@ componentWillMount(){
     }
 
     //Render Entire order list
-    renderOrderList(orders){
-        console.log('rrrrrrr'+orders[0]);
-        
+    renderOrderList(value){
 
-        //let orders = JSON.parse(value);
-
-        // for(var i=0;i < orders.length;i++ ){
-        //     console.log('Orderzzzzz'+orders[i].orderPathInFirebase);
-        
-        // }
-
-        // return (()=>{
-        //     for(var i=0;i < orders.length;i++ ){
-        //         console.log('Orderzzzzz'+orders[i].orderPathInFirebase);
-                
-        //         <View>
-
-        //             <DeliveryRequest value={JSON.stringify(orders[i])}/>
-        //         </View>
-        //     }
-        // }
-        // );
-
-        return orders.map(order=>
-            <DeliveryRequest key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} />
+        return this.state.orders.map(order=>{
+            return (
+                <DeliveryRequest 
+                    key={order.orderPathInFirebase} 
+                    value={JSON.stringify(order)} 
+                    orderPathInFirebase={order.orderPathInFirebase} 
+                />
+                        
+            );
+        }    
         )
     }
 
@@ -155,13 +142,11 @@ componentWillMount(){
         return(
             <AppConsumer>
             {(value)=>(
-                
                 <View style={{flex:1}}>
                     {this.renderNetworkError()}
-
                     <View style={{flex:16, padding:10, backgroundColor:'#F2F2F2'}}>
                         <ScrollView style={{backgroundColor:'#F2F2F2'}}>
-                            {this.renderOrderList(this.orders)}
+                            {this.renderOrderList(value.orders)}
                         </ScrollView>
                     </View>
 

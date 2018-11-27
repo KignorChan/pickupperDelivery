@@ -14,7 +14,11 @@ class App extends Component{
     state = { 
         loggedIn: null,
         orderNum:'10',
-        id:''
+        id:'',
+        uid:'',
+        username:'',
+        userphonenumber:''
+
      };
 
      orderNmu='';
@@ -34,7 +38,21 @@ class App extends Component{
 
         firebase.auth().onAuthStateChanged((user)=>{
             if(user){
-                this.setState({loggedIn: true});
+                
+                firebase.database().ref('deliveryMan/'+user.uid).on('value',(snapshot)=>{
+                    var deliveryMan = snapshot.val();
+                    this.setState({
+                        uid:deliveryMan.userId,
+                        username:deliveryMan.userName,
+                        userphonenumber: deliveryMan.phoneNumber
+                    });
+                });
+                this.setState({
+                    loggedIn: true,
+                    uid: user.uid,
+                    username:'',
+                    userphonenumber:''
+                });
             }else{
                 this.setState({loggedIn: false});
             }
@@ -95,7 +113,7 @@ class App extends Component{
             case true:
                 return(
                     <View style={{flex:1}}>
-                        <Header headerText='配送单'/> 
+                        <Header headerText={'配送员：'+this.state.username}/> 
                         <BottomNavigatorHome/>
                     </View>
                 );

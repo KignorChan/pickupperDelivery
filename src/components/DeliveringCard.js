@@ -1,50 +1,106 @@
 import React from 'react';
 import { Text, View, Image } from 'react-native';
+import firebase from 'firebase';
+import { Address } from './DeliveryRequestComponents';
 
 
-const DeliveringCard = (props)=>{
-    imageSource = props.icon;
-    text=props.text;
-    const {
-        circleRed,
-        circleBlue,
-        circleGreen,
-        circleTextstyle,
-        distanceView,
-        requestPriceView,
-        firstLineStyle,
-        textView,
-        textStyle
-    } = styles;
 
-    return (
+class DeliveringCard extends React.Component{
+    state={
+        orderPathInFirebase:'',
+        businessAddress:'',
+        businessName: '',
+        deliveryFee:'',
+        timestamp:'',
+        orderFee:'',
+        customAddress:'',
+    }
 
+    order = null;
+    orderDetail = null;
 
-        <View style={styles.rootView}>
-            <View style={{flex:1, padding:10}}>
-                <View style={firstLineStyle}>
-                    <View style={circleBlue}><Text style={circleTextstyle}>起</Text></View>
-                    <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
-                    <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
-                    <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
-                    <View style={circleGreen}><Text style={circleTextstyle}>终</Text></View>
+    constructor(props){
+        super(props);
+        
+    }
+
+    componentWillMount(){
+        this.setState({orderPathInFirebase: this.props.orderPathInFirebase});
+
+        this.order = JSON.parse(this.props.value);
+        this.orderDetail= this.order.orderDetail;
+
+        var customAddress = this.orderDetail.customerAddr ? this.orderDetail.customerAddr : null;
+        this.setState({
+            customAddress:customAddress,
+        });
+
+        var storeId = this.orderDetail.storeUid;  
+        firebase.database()
+        .ref('stores/'+storeId)
+        .on('value',snapshot=>{
+            var store = snapshot.val();
+            this.setState({
+                businessAddress:store.address,
+                businessName:store.business_name
+            });
+        });
+
+    }
+    
+    render(){
+        imageSource = this.props.icon;
+        text=this.props.text;
+
+        const {
+            circleRed,
+            circleBlue,
+            circleGreen,
+            circleTextstyle,
+            distanceView,
+            requestPriceView,
+            firstLineStyle,
+            textView,
+            textStyle
+        } = styles;
+
+        return (
+            <View style={styles.rootView}>
+                <View style={{flex:1, padding:10}}>
+                    <View style={firstLineStyle}>
+                        <View style={circleBlue}><Text style={circleTextstyle}>起</Text></View>
+                        <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
+                        <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
+                        <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
+                        <View style={circleGreen}><Text style={circleTextstyle}>终</Text></View>
+                    </View>
+                    <View style={textView}>
+                        <Address target='From' tag='店名：'>{this.state.businessName}</Address>
+                        <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
+                        <Address target='To' tag='送:'>{this.state.customAddress}</Address>
+                    <View style={textView}>
+                        <Text style={textStyle}>剩余时间：</Text>
+                        <Text style={textStyle}>订单简况：</Text>
+                    </View>
+                    </View>
                 </View>
-                <View style={textView}><Text style={textStyle}>剩余时间：</Text></View>
-                <View style={textView}><Text style={textStyle}>接收人：</Text></View>
-                <View style={textView}><Text style={textStyle}>订单简况：</Text></View>
-            </View>
-            <View style={{justifyContent:'center'}}>
-                <Image
-                    source={require('../../img/nextArrow.png')}
-                    style={{
-                        width:20,
-                        height: 20
-                    }}
-                />
-            </View>
+                <View style={{justifyContent:'center'}}>
+                    <Image
+                        source={require('../../img/nextArrow.png')}
+                        style={{
+                            width:20,
+                            height: 20
+                        }}
+                    />
+                </View>
 
-        </View>
-    );
+            </View>
+        );
+    }
+    
+    
+    
+    
 }
 
 const styles = {

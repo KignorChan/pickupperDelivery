@@ -12,6 +12,12 @@ export const AppConsumer = AppContext.Consumer;
 export class AppProvider extends React.Component{
     orders = [];
     //orders = [];
+    state = {
+        uid:'',
+        username:'',
+        userphonenumber:'',
+        email:''
+    }
 
     constructor(props){
         super(props);
@@ -24,6 +30,24 @@ export class AppProvider extends React.Component{
     }
 
     componentWillMount(){ 
+        firebase.auth().onAuthStateChanged((user)=>{
+            if(user){
+                this.setState({email: user.email}) 
+                firebase.database().ref('deliveryMan/'+user.uid).on('value',(snapshot)=>{
+                    var deliveryMan = snapshot.val();
+                    this.setState({
+                        uid:deliveryMan.userId,
+                        username:deliveryMan.userName,
+                        userphonenumber: deliveryMan.phoneNumber
+                    });
+                });
+            }else{
+                
+            } 
+        });
+
+
+
         getData = (snapshot)=>{
 
             const dataObject = snapshot.val() || null;
@@ -78,12 +102,17 @@ export class AppProvider extends React.Component{
 
     }
 
+    updateContext(){
 
+    }
 
     render(){
         return(
             <AppContext.Provider value={{
-                orders: JSON.stringify(this.orders)
+                orders: JSON.stringify(this.orders),
+                userName: this.state.username,
+                email: this.state.email,
+                userId: this.state.uid,
             }}>
                 {this.props.children}
             </AppContext.Provider>

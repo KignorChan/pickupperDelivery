@@ -1,8 +1,9 @@
 import React from 'react';
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, Alert } from 'react-native';
 import { Address, RoundSquare, Button } from './DeliveryRequestComponents';
 import firebase from 'firebase';
 import DataController from '../../model/DataController';
+import { AppConsumer } from '../../model/AppContext'
 
 class DeliveryRequest extends React.Component{
     order = null;
@@ -14,6 +15,7 @@ class DeliveryRequest extends React.Component{
         deliveryFee:'',
         timestamp:'',
         orderFee:'',
+        customAddress:'',
 
     }
 
@@ -23,7 +25,7 @@ class DeliveryRequest extends React.Component{
     }
 
     componentWillMount(){
-        console.log('zzzzzzzz'+this.props.orderPathInFirebase);
+        //console.log('zzzzzzzz'+this.props.orderPathInFirebase);
         this.setState({orderPathInFirebase: this.props.orderPathInFirebase});
 
         this.order = JSON.parse(this.props.value);
@@ -32,6 +34,10 @@ class DeliveryRequest extends React.Component{
         console.log('qqqqqq'+this.order.orderPathInFirebase);
 
         var storeId = this.orderDetail.storeUid;
+        var customAddress = this.orderDetail.customerAddr ? this.orderDetail.customerAddr : null;
+        this.setState({
+            customAddress:customAddress,
+        });
         
 
         firebase.database()
@@ -60,14 +66,25 @@ class DeliveryRequest extends React.Component{
         
     }
 
-    submitGetDelivery(){
-        alert(this.state.orderPathInFirebase);
-        firebase.database()
-        .ref(this.props.orderPathInFirebase)
-        .update({
-            status:'completed',
-            courier:'001',
-        });
+    submitGetDelivery(uid){
+        //alert(this.state.orderPathInFirebase);
+        console.log('asdasd'+uid);
+        Alert.alert(
+            '订单确认',
+            '你确定接受这份订单吗？',
+            [
+              {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: 'OK', onPress: () => {
+                firebase.database()
+                .ref(this.props.orderPathInFirebase)
+                .update({
+                    status:'delivering',
+                    courierId: uid,
+                });
+              }},
+            ],
+            { cancelable: false }
+          )
     }
 
     render(){
@@ -90,48 +107,56 @@ class DeliveryRequest extends React.Component{
         } = styles;
 
         return (
-            <View style={requestViewStyle}>
-                
-                <View style={firstLineStyle}>
-                    <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
-                    <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
-                    <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
-                    <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
-                    <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
-                    <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$ {this.state.deliveryFee}</Text></View>
-                </View>
-    
-                <View style={horizontalArrangement}>
-                    <View style={{flex: 1}}>
-                        <Address target='From' tag='店名：'>{this.state.businessName}</Address>
-                        <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
-                        <Address target='To' tag='送:'>630 Marham Road, scarborough, ON, M1D2G3 </Address>
-                        <View style={horizontalArrangement}>
-                            <RoundSquare>订单价格:{this.state.orderFee}元</RoundSquare>
-                            <RoundSquare>下单时间：{orderTime}</RoundSquare>
+            <AppConsumer>
+            {(value)=>(
+                <View style={requestViewStyle}>
+                    
+                    <View style={firstLineStyle}>
+                        <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
+                        <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
+                        <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
+                        <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
+                        <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
+                        <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$ {this.state.deliveryFee}</Text></View>
+                    </View>
+        
+                    <View style={horizontalArrangement}>
+                        <View style={{flex: 1}}>
+                            <Address target='From' tag='店名：'>{this.state.businessName}</Address>
+                            <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
+                            <Address target='To' tag='送:'>{this.state.customAddress}</Address>
+                            <View style={horizontalArrangement}>
+                                <RoundSquare>订单价格:{this.state.orderFee}元</RoundSquare>
+                                <RoundSquare>下单时间：{orderTime}</RoundSquare>
+                            </View>
+                            <View style={remarksViewStyle}>
+                                <Text style={remarksTextStyle}>备注：</Text>
+                            </View>
                         </View>
-                        <View style={remarksViewStyle}>
-                            <Text style={remarksTextStyle}>备注：</Text>
+                        <View style={{
+                                justifyContent:'center'
+                            }}>
+                            <Image
+                                source={require('../../img/nextArrow.png')}
+                                style={{
+                                    width:20,
+                                    height: 20
+                                }}
+                            />
                         </View>
                     </View>
-                    <View style={{
-                            justifyContent:'center'
-                        }}>
-                        <Image
-                            source={require('../../img/nextArrow.png')}
-                            style={{
-                                width:20,
-                                height: 20
-                            }}
-                        />
+                    
+        
+                    <View>
+                        <Button text='取单' onPress={this.submitGetDelivery.bind(this, value.userId)}/>
                     </View>
                 </View>
-                
-    
-                <View>
-                    <Button text='取单' onPress={this.submitGetDelivery.bind(this)}/>
-                </View>
-            </View>
+            )}
+            </AppConsumer>
+
+
+
+            
         );
     }
 }

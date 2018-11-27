@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, TextInput, View, Image, TouchableOpacity } from 'react-native';
+import { Text, TextInput, View, Image, TouchableOpacity, Alert } from 'react-native';
 import firebase from 'firebase';
 
 import { Input,Button, OnPressText } from '../src/components/Common';
@@ -7,6 +7,8 @@ import { Input,Button, OnPressText } from '../src/components/Common';
 
 class Login extends Component{
     state = {
+        username:'',
+        phonenumber:'',
         email:'',
         password:'',
         passwordConfirm:'',
@@ -14,22 +16,27 @@ class Login extends Component{
         loadErrorMessage: null,
         loadEmailValidationErrorMessage: null,
         loadPasswordNotMatchErrorMessage: null,
+        loadEmptyInputErrorMessage: null,
     };
 
     loginButtonPressed(){
         const { email, password }=this.state;
-        if(this.validateEmail(email)){
-            firebase.auth().signInWithEmailAndPassword(email, password).then(
-                ()=>{console.log('Sucessly login')}
-            ).catch(
-                ()=>{
-    
-                    console.log('failed login:'+ email +'  '+ password);
-                    this.setState({loadErrorMessage:true});
-            });
+        if( email=='' || password == '' ){
+            Alert.alert('注意','输入项不能为空！');
         }else{
-            this.setState({loadEmailValidationErrorMessage:true});
-        } 
+            if(this.validateEmail(email)){
+                firebase.auth().signInWithEmailAndPassword(email, password).then(
+                    ()=>{console.log('Sucessly login')}
+                ).catch(
+                    ()=>{
+        
+                        console.log('failed login:'+ email +'  '+ password);
+                        this.setState({loadErrorMessage:true});
+                });
+            }else{
+                this.setState({loadEmailValidationErrorMessage:true});
+            } 
+        }
     }
 
     renderEmailValidationErrorMessage(){
@@ -43,7 +50,15 @@ class Login extends Component{
     renderPasswordNotMatchErrorMessage(){
         if(this.state.loadPasswordNotMatchErrorMessage){
             return (
-                <OnPressText text='密码不一致，请重新输入！' onPress={this.findPassword.bind(this)}/>
+                <OnPressText text='密码不一致，请重新输入！' />
+            );
+        }
+    }
+
+    renderEmptyInputErrorMessage(){
+        if(this.state.loadEmptyInputErrorMessage){
+            return (
+                <OnPressText text='输入项不能为空！' />
             );
         }
     }
@@ -53,12 +68,22 @@ class Login extends Component{
             email:'',
             password:'',
             passwordConfirm:'',
+            username:'',
+            phonenumber:'',
+            loadRegisterPage: true,
+            loadErrorMessage: null,
+            loadEmailValidationErrorMessage: null,
+            loadPasswordNotMatchErrorMessage: null,
         });
-        this.setState({loadRegisterPage: true});
     }
 
     findPassword(){
         console.log('Find password!');
+        firebase.auth().sendPasswordResetEmail(this.state.email).then(()=>{
+            Alert.alert('发送成功','重设密码邮件已发到你的邮箱，请前往你的邮件进行操作！');
+        }).catch((error)=>{
+            console.log(error);
+        });
     }
 
     renderErrorMessage(){
@@ -71,33 +96,62 @@ class Login extends Component{
 
     backToLogin(){
         this.setState({
+            username:'',
+            phonenumber:'',
             email:'',
             password:'',
             passwordConfirm:'',
-            loadErrorMessage: null
+            loadErrorMessage: null,
+            loadRegisterPage: null,
+            loadEmailValidationErrorMessage: null,
+            loadPasswordNotMatchErrorMessage: null,
         });
-        this.setState({loadRegisterPage: null});
+
     }
 
     createUserButton(){
-        if(this.matchPassword()){
-            const { email, password }=this.state;
-            firebase.auth().createUserWithEmailAndPassword(email, password).then(
-                ()=>{
-                    console.log('Sucessfully regist!');
-                }
-            ).catch(
-                ()=>{
-                    console.log('Fail to  regist!');
-                }
-            );
+        const { username, phonenumber, email, password, passwordConfirm }=this.state;
+
+        if(username=='' || phonenumber=='' || email=='' || password=='' || passwordConfirm==''){
+            Alert.alert('注意', '输入项不能为空！');
         }else{
-            this.setState({loadPasswordNotMatchErrorMessage: true});
+
+            if(this.validateEmail(email)){
+                if(this.matchPassword()){
+                    
+                    firebase.auth().createUserWithEmailAndPassword(email, password).then(
+                        (data)=>{
+                            console.log(data.user.uid);
+                            //regist username and phonenumber
+                            //alert(data.user.uid);
+                            firebase.database().ref('deliveryMan/'+data.user.uid).update({
+                                userId: data.user.uid,
+                                userName: username,
+                                phoneNumber: phonenumber,
+                            });
+                        }
+                    ).catch(
+                        (error)=>{
+                            // Handle Errors here.
+                            var errorCode = error.code;
+                            var errorMessage = error.message;
+                            if (errorCode == 'auth/weak-password') {
+                                alert('The password is too weak.');
+                            } else {
+                                alert(errorMessage);
+                            }
+                            console.log(error);
+                        }
+                    );
+                }else{
+                    this.setState({loadPasswordNotMatchErrorMessage: true});
+                }
+            }else{
+                this.setState({loadEmailValidationErrorMessage:true});
+            }
         }
 
 
-
-        
 
     }
 
@@ -172,9 +226,9 @@ class Login extends Component{
             <View style={containerStyle}>
             <Input 
                 autoFocus= {true}
-                placeHolder='请输入用户名' 
+                placeHolder='请输入邮箱' 
                 value={this.state.email}
-                onChangeText={(email) => this.setState({email})}
+                onChangeText={(email) => this.setState({email, loadEmailValidationErrorMessage:false})}
             />
             <Input 
                 placeHolder='请输入密码' 
@@ -187,6 +241,21 @@ class Login extends Component{
                 value={this.state.passwordConfirm} 
                 onChangeText={passwordConfirm => this.setState({passwordConfirm:passwordConfirm, loadPasswordNotMatchErrorMessage:null})}
                 secureTextEntry={true}
+            />
+
+            <View style={{height:50 }}>
+
+            </View>
+            <Input 
+                placeHolder='请输入用户名' 
+                value={this.state.username}
+                onChangeText={(username) => this.setState({username})}
+            />
+            <Input 
+                placeHolder='请输入手机号码' 
+                keyboardType='numeric'
+                value={this.state.phonenumber}
+                onChangeText={(phonenumber) => this.setState({phonenumber})}
             />
             
             <View style={{ alignItems:'flex-end', justifyContent:'flex-end', flexDirection:'row'}}>
@@ -205,9 +274,10 @@ class Login extends Component{
                         fontSize: 14,
                     }}>返回登陆界面</Text>
                 </TouchableOpacity>
-            </View>
+            </View >
             <View>
                 {this.renderPasswordNotMatchErrorMessage()}
+                {this.renderEmailValidationErrorMessage()}
             </View>
             
             <View style={{ marginTop:20 }}>
@@ -217,21 +287,15 @@ class Login extends Component{
         );
     }
 
+    renderResetPassword
+
     render(){
         if(this.state.loadRegisterPage){
             return(this.renderRegisterPage());
-            
         }
 
         return(this.renderLogin());  
     }
-
-
-
-
-
-    
-
 
 }
 
