@@ -8,6 +8,17 @@ class DeliveryProcessBar extends React.Component{
     state={
         meToBusinessDistance: '',
         meToCustomerDistance: '',
+        businessAddress:'',
+        customerAddress:''
+    }
+
+    constructor(props){
+        super(props);
+        this.setState({
+            businessAddress:this.props.businessAddress,
+            customerAddress:this.props.customerAddress,
+        });
+
     }
     
 
