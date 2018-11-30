@@ -28,6 +28,8 @@ class DeliveryRequest extends React.Component{
         meToBusinessDistance:0,
         businessToCustomerDistance:0,
 
+        orderDetail:null,
+
     }
 
 
@@ -42,8 +44,12 @@ class DeliveryRequest extends React.Component{
 
         this.order = JSON.parse(this.props.value);
         this.orderDetail= this.order.orderDetail;
+        
 
-        console.log('qqqqqq'+this.order.orderPathInFirebase);
+        firebase.database().ref(this.props.orderPathInFirebase).on('value',snapshot=>{
+            orderObj = snapshot.val();
+            this.setState({orderDetail:orderObj});
+        })
 
         storeId = this.orderDetail.storeUid;
         userId = this.orderDetail.userId;
@@ -119,16 +125,20 @@ class DeliveryRequest extends React.Component{
             [
               {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
               {text: 'OK', onPress: () => {
-                firebase.database()
-                .ref(this.props.orderPathInFirebase)
-                .update({
-                    status:'delivering',
-                    courierId: uid,
-                });
-                this.setState({              /////////
-                    status:'delivering',
-                });
-                this.forceUpdate();
+                if(this.state.orderDetail.status!='progressing'){
+                    Alert.alert('取单失败','看来你慢了一步，此单已被他人提取了！');
+                }else{
+                    firebase.database()
+                    .ref(this.props.orderPathInFirebase)
+                    .update({
+                        status:'delivering',
+                        courierId: uid,
+                    }).then(()=>{
+                        Alert.alert('取单成功', '去完成你的伟大使命吧！');
+                    }).catch((error)=>{
+                        alert(error);
+                    });
+                }
               }},
             ],
             { cancelable: false }
@@ -172,9 +182,7 @@ class DeliveryRequest extends React.Component{
             remarksViewStyle,
             remarksTextStyle
         } = styles;
-        if(this.state.status == 'delivering'){
-            return (null);
-        }else{
+        if(this.state.orderDetail.status == 'progressing'){
             return (
                 <AppConsumer>
                 {(value)=>(
@@ -213,8 +221,6 @@ class DeliveryRequest extends React.Component{
                                 />
                             </View>
                         </View>
-                        
-            
                         <View>
                             <Button text='取单' onPress={this.submitGetDelivery.bind(this, value.userId)}/>
                         </View>
@@ -223,6 +229,8 @@ class DeliveryRequest extends React.Component{
                 </AppConsumer>
                 
             );
+        }else{
+            return null;
         }
 
         
