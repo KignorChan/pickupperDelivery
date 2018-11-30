@@ -1,10 +1,12 @@
 import React from 'react';
-import { Text, View, Image, Alert } from 'react-native';
+import { Text, View, Image, Alert, TouchableOpacity } from 'react-native';
 import { Address, RoundSquare, Button } from './DeliveryRequestComponents';
 import firebase from 'firebase';
 import geolib from 'geolib';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
 import DataController from '../../model/DataController';
-import { AppConsumer } from '../../model/AppContext'
+import { AppConsumer } from '../../model/AppContext';
+import { DeliveryProcessBar } from './Common'
 
 class DeliveryRequest extends React.Component{
     order = null;
@@ -17,6 +19,7 @@ class DeliveryRequest extends React.Component{
         timestamp:'',
         orderFee:'',
         customAddress:'',
+        stripeId: '',
         
         userPosition:null,
 
@@ -34,9 +37,7 @@ class DeliveryRequest extends React.Component{
 
     componentWillMount(){
         this.getCurrentUserPosition();
-        //alert(DataController.parseTimeStamp(1543191201422.728));
 
-        //console.log('zzzzzzzz'+this.props.orderPathInFirebase);
         this.setState({orderPathInFirebase: this.props.orderPathInFirebase});
 
         this.order = JSON.parse(this.props.value);
@@ -44,11 +45,21 @@ class DeliveryRequest extends React.Component{
 
         console.log('qqqqqq'+this.order.orderPathInFirebase);
 
-        var storeId = this.orderDetail.storeUid;
-        var customAddress = this.orderDetail.customerAddr ? this.orderDetail.customerAddr : null;
-        this.setState({
-            customAddress:customAddress,
+        storeId = this.orderDetail.storeUid;
+        userId = this.orderDetail.userId;
+
+        firebase.database().ref('users/'+userId).on('value', snapshot=>{
+            var userObj = snapshot.val();
+            customAddress = userObj.pickupLocation;
+            stripeId = userObj.stripeId;
+            this.setState({
+                customAddress:customAddress,
+            });
+
         });
+
+
+
         
 
         firebase.database()
@@ -101,7 +112,6 @@ class DeliveryRequest extends React.Component{
 
 
     submitGetDelivery(uid){
-        //alert(this.state.orderPathInFirebase);
         console.log('asdasd'+uid);
         Alert.alert(
             '订单确认',
@@ -127,7 +137,7 @@ class DeliveryRequest extends React.Component{
 
     meToBusinessDistance(){
         var distance = geolib.getDistance(
-                            {latitude:43.77173745, longitude: -79.26133264244683},
+                            {latitude:43.77173745, longitude: -79.26133264244683},   //要改成GPS获取的位置
                             this.state.businessCoord
                         )
 
@@ -140,13 +150,15 @@ class DeliveryRequest extends React.Component{
 
     }
 
-    render(){
-    var timestamp = DataController.parseTimeStamp(this.state.timestamp);
-    console.log(timestamp);
-    var orderTime = timestamp[0]+'/'+timestamp[1]+'/'+timestamp[2]+' '+timestamp[3]+':'+timestamp[4]+':'+timestamp[5];
-        
-    
+    handleOnPress(){
+        this.props.onPress(this.state.orderPathInFirebase, this.state.businessName);
+    }
 
+    render(){
+        var timestamp = DataController.parseTimeStamp(this.state.timestamp);
+        console.log(timestamp);
+
+        var orderTime = timestamp[0]+'/'+timestamp[1]+'/'+timestamp[2]+' '+timestamp[3]+':'+timestamp[4]+':'+timestamp[5];
         const {
             requestViewStyle,
             circleRed,
@@ -166,14 +178,13 @@ class DeliveryRequest extends React.Component{
             return (
                 <AppConsumer>
                 {(value)=>(
-                    <View style={requestViewStyle}>
-                        
+                    <TouchableOpacity style={requestViewStyle} onPress={this.handleOnPress.bind(this)}>
                         <View style={firstLineStyle}>
-                            <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
-                            <View style={distanceView}><Text style={distanceView.textStyle}>{this.meToBusinessDistance()}</Text></View>
-                            <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>
-                            <View style={distanceView}><Text style={distanceView.textStyle}>{this.state.businessToCustomerDistance}</Text></View>
-                            <View style={circleGreen}><Text style={circleTextstyle}>送</Text></View>
+                            <View style={{flex:5}}>
+                                <DeliveryProcessBar/>
+
+                            </View>
+
                             <View style={requestPriceView}><Text style={requestPriceView.textStyle}>$ {this.state.deliveryFee}</Text></View>
                         </View>
             
@@ -207,7 +218,7 @@ class DeliveryRequest extends React.Component{
                         <View>
                             <Button text='取单' onPress={this.submitGetDelivery.bind(this, value.userId)}/>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 )}
                 </AppConsumer>
                 
@@ -288,7 +299,8 @@ const styles = {
             fontStyle: 'normal',
             fontWeight: 'bold',
             fontSize: 20,
-        }
+        },
+        flex:1
     },
     firstLineStyle:{
         flexDirection: 'row',
@@ -302,5 +314,7 @@ const styles = {
         color: '#e65c00',
     }
 }
+
+const Navigator = createStackNavigator
 
 export default DeliveryRequest;

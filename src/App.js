@@ -9,7 +9,6 @@ import Login from '../screen/Login';
 import { Spinner } from './components/Common';
 import DataController from '../model/DataController';
 import { AppProvider } from '../model/AppContext';
-import OrderDetail from '../screen/OrderDetail';
 
 class App extends Component{
     state = { 
@@ -114,7 +113,6 @@ class App extends Component{
             case true:
                 return(
                     <View style={{flex:1}}>
-                        <Header headerText={'配送员：'+this.state.username}/> 
                         <BottomNavigatorHome/>
                     </View>
                 );
@@ -144,6 +142,8 @@ class App extends Component{
                 </View>   
             </AppProvider>
             //<OrderDetail/>
+            //<Header headerText={'配送员：'+this.state.username}/> 
+
                 
                 
          

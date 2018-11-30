@@ -9,7 +9,7 @@ import PersonalCenter from '../screen/PersonalCenter';
 import Delivering from '../screen/Delivering';
  
 
-export default createBottomTabNavigator({
+const BottomNavigation =  createBottomTabNavigator({
     Home: {
         screen: Mainscreen,
         navigationOptions:{
@@ -38,3 +38,6 @@ export default createBottomTabNavigator({
         }
     }
 });
+
+
+export default BottomNavigation;

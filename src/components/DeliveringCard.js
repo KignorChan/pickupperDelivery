@@ -1,9 +1,7 @@
 import React from 'react';
-import { Text, View, Image } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 import firebase from 'firebase';
 import { Address } from './DeliveryRequestComponents';
-
-
 
 class DeliveringCard extends React.Component{
     state={
@@ -30,9 +28,16 @@ class DeliveringCard extends React.Component{
         this.order = JSON.parse(this.props.value);
         this.orderDetail= this.order.orderDetail;
 
-        var customAddress = this.orderDetail.customerAddr ? this.orderDetail.customerAddr : null;
-        this.setState({
-            customAddress:customAddress,
+        var userId = this.orderDetail.userId;
+
+        firebase.database().ref('users/'+userId).on('value', snapshot=>{
+            var userObj = snapshot.val();
+            customAddress = userObj.pickupLocation;
+            stripeId = userObj.stripeId;
+            this.setState({
+                customAddress:customAddress,
+            });
+
         });
 
         var storeId = this.orderDetail.storeUid;  
@@ -46,6 +51,11 @@ class DeliveringCard extends React.Component{
             });
         });
 
+    }
+
+    handleOnPress(){
+        //alert(this.state.orderPathInFirebase);
+        this.props.onPress(this.state.orderPathInFirebase, this.state.businessName);
     }
     
     render(){
@@ -65,7 +75,7 @@ class DeliveringCard extends React.Component{
         } = styles;
 
         return (
-            <View style={styles.rootView}>
+            <TouchableOpacity style={styles.rootView} onPress={this.handleOnPress.bind(this)}>
                 <View style={{flex:1, padding:10}}>
                     <View style={firstLineStyle}>
                         <View style={circleBlue}><Text style={circleTextstyle}>起</Text></View>
@@ -94,7 +104,7 @@ class DeliveringCard extends React.Component{
                     />
                 </View>
 
-            </View>
+            </TouchableOpacity>
         );
     }
     

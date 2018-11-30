@@ -113,6 +113,7 @@ export class AppProvider extends React.Component{
                 userName: this.state.username,
                 email: this.state.email,
                 userId: this.state.uid,
+                userphonenumber: this.state.userphonenumber
             }}>
                 {this.props.children}
             </AppContext.Provider>

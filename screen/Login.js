@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Text, TextInput, View, Image, TouchableOpacity, Alert } from 'react-native';
+import { Text, TextInput, View, Image, TouchableOpacity, Alert, KeyboardAvoidingView, ScrollView } from 'react-native';
 import firebase from 'firebase';
+import ImagePicker from 'react-native-image-picker';
 
-import { Input,Button, OnPressText } from '../src/components/Common';
+import { Input,Button, OnPressText, Avatar } from '../src/components/Common';
 
 
 class Login extends Component{
@@ -17,6 +18,7 @@ class Login extends Component{
         loadEmailValidationErrorMessage: null,
         loadPasswordNotMatchErrorMessage: null,
         loadEmptyInputErrorMessage: null,
+        avatarSource:'',
     };
 
     loginButtonPressed(){
@@ -182,6 +184,41 @@ class Login extends Component{
         }
     }
 
+
+    //Not test yet
+    uploadImage(){
+        //alert('upload image');
+        const options = {
+            title: 'Select Avatar',
+            customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
+            storageOptions: {
+              skipBackup: true,
+              path: 'images',
+            },
+        };
+
+        ImagePicker.showImagePicker(options, (response) => {
+            console.log('Response = ', response);
+          
+            if (response.didCancel) {
+              console.log('User cancelled image picker');
+            } else if (response.error) {
+              console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+              console.log('User tapped custom button: ', response.customButton);
+            } else {
+              const source = { uri: response.uri };
+          
+              // You can also display the image using data:
+              // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+          
+              this.setState({
+                avatarSource: source,
+              });
+            }
+          });
+    }
+
     renderLogin(){
         const { containerStyle } = styles;
 
@@ -189,8 +226,8 @@ class Login extends Component{
         console.log(this.state.password);
 
         return(
-            <View style={containerStyle}>
-            <Image source={require('../img/logo.png')} />
+            <KeyboardAvoidingView style={containerStyle} behavior="padding" enabled>
+            <Image source={require('../img/logo.png')}/>
 
             <Input 
                 autoFocus= {true}
@@ -215,7 +252,8 @@ class Login extends Component{
             <View style={{ marginTop: 20 }}>
                 <Button text='新用户注册' onPress={this.loadRegisterPage.bind(this)}/>
             </View>
-        </View>
+        </KeyboardAvoidingView>
+
         );
     }
 
@@ -223,7 +261,15 @@ class Login extends Component{
         const { containerStyle } = styles;
 
         return (
-            <View style={containerStyle}>
+            
+            <KeyboardAvoidingView style={containerStyle} behavior="padding" enabled>
+            <Avatar 
+                source={require('../img/qq.jpg')} 
+                style={{height:120, width:120}} 
+                username={this.state.username} 
+                imageUpdatable={true}
+                onPress={this.uploadImage.bind(this)}/>
+                
             <Input 
                 autoFocus= {true}
                 placeHolder='请输入邮箱' 
@@ -283,7 +329,7 @@ class Login extends Component{
             <View style={{ marginTop:20 }}>
                 <Button text='注册' onPress={this.createUserButton.bind(this)}/>
             </View>
-            </View>
+            </KeyboardAvoidingView>
         );
     }
 

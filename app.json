@@ -1,4 +1,10 @@
 {
   "name": "pickupperDelivery",
-  "displayName": "pickupperDelivery"
+  "displayName": "pickupperDelivery",
+  "infoPlist": {
+    "NSCameraUsageDescription": "This app uses the camera to scan barcodes on event tickets.",
+    "NSPhotoLibraryUsageDescription": "This app would like access to your photo gallery",
+    "NSPhotoLibraryAddUsageDescription":"This app would like to save photos to your photo gallery",
+    "NSMicrophoneUsageDescription":"This app would like to your microphone (for videos)"
+  }
 }

@@ -1,9 +1,12 @@
 import React, {Component} from 'react';
 import { Text, View, Image, ScrollView } from 'react-native';
+import { createStackNavigator } from 'react-navigation';
 import DeliveringCard from '../src/components/DeliveringCard';
 import firebase from 'firebase';
 import { AppConsumer } from '../model/AppContext';
 import DeliveryRequest from '../src/components/DeliveryRequest'; 
+import OrderDetail from './OrderDetail';
+
 
 //import DeliveryRequest from '../src/components/DeliveryRequest'; 
 
@@ -13,6 +16,18 @@ class Delivering extends Component{
         userId:'',
         orders:[]
     }
+
+    static navigationOptions = ({navigation}) => ({
+        title: "配送列表",
+        headerStyle: {
+            backgroundColor: '#0080ff',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize:20,
+        },
+    })
 
     orders = [];
 
@@ -95,16 +110,8 @@ class Delivering extends Component{
                 .ref('/orders/')
                 .on('value', getData, getError);
 
-
-
-
-                //////////////
-
             }
         });
-
-        
-
     }
 
     renderDeliveryCards(orders){
@@ -117,10 +124,16 @@ class Delivering extends Component{
                // alert(order.orderPathInFirebase)
 
                 return (            
-                    <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase}/>
+                    <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} onPress={this.returnValueFromCard}/>
                 );
             }
         });
+    }
+
+    //get the value(orderPathInFirebase) by clicking specific card
+    returnValueFromCard = (orderPathOnFirebase, businessName)=>{
+        //alert(value);
+        this.props.navigation.navigate('Detail', {orderPathOnFirebase, businessName});
     }
     
     
@@ -136,4 +149,14 @@ class Delivering extends Component{
 }
 
 
-export default Delivering;
+//export default Delivering;
+
+export default createStackNavigator({
+    Delivering: {
+        screen: Delivering,
+    },
+    Detail:{
+        screen: OrderDetail
+    }
+
+});
