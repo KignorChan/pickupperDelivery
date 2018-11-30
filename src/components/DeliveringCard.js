@@ -12,6 +12,7 @@ class DeliveringCard extends React.Component{
         timestamp:'',
         orderFee:'',
         customAddress:'',
+        orderDetail:null,
     }
 
     order = null;
@@ -27,6 +28,14 @@ class DeliveringCard extends React.Component{
 
         this.order = JSON.parse(this.props.value);
         this.orderDetail= this.order.orderDetail;
+
+
+        firebase.database().ref(this.props.orderPathInFirebase).on('value',snapshot=>{
+            orderObj = snapshot.val();
+            this.setState({
+                orderDetail:orderObj
+            });
+        })
 
         var userId = this.orderDetail.userId;
 
@@ -74,38 +83,44 @@ class DeliveringCard extends React.Component{
             textStyle
         } = styles;
 
-        return (
-            <TouchableOpacity style={styles.rootView} onPress={this.handleOnPress.bind(this)}>
-                <View style={{flex:1, padding:10}}>
-                    <View style={firstLineStyle}>
-                        <View style={circleBlue}><Text style={circleTextstyle}>起</Text></View>
-                        <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
-                        <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
-                        <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
-                        <View style={circleGreen}><Text style={circleTextstyle}>终</Text></View>
+        if(this.state.orderDetail.status=='delivering'){
+            return (
+                <TouchableOpacity style={styles.rootView} onPress={this.handleOnPress.bind(this)}>
+                    <View style={{flex:1, padding:10}}>
+                        <View style={firstLineStyle}>
+                            <View style={circleBlue}><Text style={circleTextstyle}>起</Text></View>
+                            <View style={distanceView}><Text style={distanceView.textStyle}>12km</Text></View>
+                            <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
+                            <View style={distanceView}><Text style={distanceView.textStyle}>8km</Text></View>
+                            <View style={circleGreen}><Text style={circleTextstyle}>终</Text></View>
+                        </View>
+                        <View style={textView}>
+                            <Address target='From' tag='店名：'>{this.state.businessName}</Address>
+                            <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
+                            <Address target='To' tag='送:'>{this.state.customAddress}</Address>
+                        <View style={textView}>
+                            <Text style={textStyle}>剩余时间：</Text>
+                            <Text style={textStyle}>订单简况：</Text>
+                        </View>
+                        </View>
                     </View>
-                    <View style={textView}>
-                        <Address target='From' tag='店名：'>{this.state.businessName}</Address>
-                        <Address target='From' tag='取:'>{this.state.businessAddress}</Address>
-                        <Address target='To' tag='送:'>{this.state.customAddress}</Address>
-                    <View style={textView}>
-                        <Text style={textStyle}>剩余时间：</Text>
-                        <Text style={textStyle}>订单简况：</Text>
+                    <View style={{justifyContent:'center'}}>
+                        <Image
+                            source={require('../../img/nextArrow.png')}
+                            style={{
+                                width:20,
+                                height: 20
+                            }}
+                        />
                     </View>
-                    </View>
-                </View>
-                <View style={{justifyContent:'center'}}>
-                    <Image
-                        source={require('../../img/nextArrow.png')}
-                        style={{
-                            width:20,
-                            height: 20
-                        }}
-                    />
-                </View>
+    
+                </TouchableOpacity>
+            );
 
-            </TouchableOpacity>
-        );
+        }else{
+            return null;
+        }
+        
     }
     
     
