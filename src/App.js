@@ -79,11 +79,6 @@ class App extends Component{
         .on('value', snapshot => {
             const id = snapshot.key;
             var temp = JSON.stringify(snapshot.val());
-            // console.log('Aaaaaaa: '+ temp);
-            //this._storeData('newOrderData',temp);
-
-            
-            //alert(id);
 
             //----------OR----------//
             const data = snapshot.val() || null;
@@ -95,18 +90,7 @@ class App extends Component{
               
             }
         });
-        //alert(this.state.id);
-
-        
     }
-    
-    // _storeData = async (key, value) => {
-    //     try {
-    //       await AsyncStorage.setItem(key, value);
-    //     } catch (error) {
-    //       // Error saving data
-    //     }
-    //   }
 
     renderContent(){
         switch(this.state.loggedIn){

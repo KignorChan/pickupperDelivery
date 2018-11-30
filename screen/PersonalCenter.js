@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import firebase from 'firebase';
 import { createStackNavigator } from 'react-navigation';
 import { PressSession } from '../src/components/Common';
@@ -9,6 +9,7 @@ import PersonInfoEdit from './PersonInfoEdit';
 class PersonalCenter extends Component{
     state={
         renderEditUserInfoView: null,
+        avatarSource:require('../img/qq.jpg'),
     }
 
     static navigationOptions = ({navigation}) => ({
@@ -41,9 +42,9 @@ class PersonalCenter extends Component{
         };
 
         return (
-            <View style={styles.viewStyle}>
+            <ScrollView style={styles.viewStyle}>
                 <TouchableOpacity style={{marginTop:40}} onPress={this.renderEditUserInfoView.bind(this)}>
-                    <PersonalInfoCard/>
+                    <PersonalInfoCard source={this.state.avatarSource}/>
                 </TouchableOpacity>
                 <View style={{marginTop:20}}>
                      <PressSession text='我的等级' icon={require('../img/reward.png')}/>
@@ -60,7 +61,7 @@ class PersonalCenter extends Component{
                     onPress={this.signOut.bind(this)}/>
                 </View>
                 
-            </View>
+            </ScrollView>
         );
     }
 

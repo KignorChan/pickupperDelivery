@@ -18,7 +18,7 @@ class Login extends Component{
         loadEmailValidationErrorMessage: null,
         loadPasswordNotMatchErrorMessage: null,
         loadEmptyInputErrorMessage: null,
-        avatarSource:'',
+        avatarSource:require('../img/qq.jpg'),
     };
 
     loginButtonPressed(){
@@ -190,7 +190,6 @@ class Login extends Component{
         //alert('upload image');
         const options = {
             title: 'Select Avatar',
-            customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
             storageOptions: {
               skipBackup: true,
               path: 'images',
@@ -215,9 +214,21 @@ class Login extends Component{
               this.setState({
                 avatarSource: source,
               });
+
+              //this.uploadImage(response.uri);
+              
+
+              console.log('avatarSource'+source.uri);
             }
           });
     }
+
+    // uploadImage = async(uri) => {
+    //     const response = await fetch(uri);
+    //     const blob = await response.blob();
+    //     var ref = firebase.storage().ref('useravatar').child("my-image");
+    //     return ref.put(blob);
+    // }
 
     renderLogin(){
         const { containerStyle } = styles;
@@ -264,7 +275,7 @@ class Login extends Component{
             
             <KeyboardAvoidingView style={containerStyle} behavior="padding" enabled>
             <Avatar 
-                source={require('../img/qq.jpg')} 
+                source={this.state.avatarSource} 
                 style={{height:120, width:120}} 
                 username={this.state.username} 
                 imageUpdatable={true}
