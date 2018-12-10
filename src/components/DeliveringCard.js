@@ -1,7 +1,7 @@
 import React from 'react';
-import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import firebase from 'firebase';
-import { Address } from './DeliveryRequestComponents';
+import { Address, Button } from './DeliveryRequestComponents';
 
 class DeliveringCard extends React.Component{
     state={
@@ -13,6 +13,7 @@ class DeliveringCard extends React.Component{
         orderFee:'',
         customAddress:'',
         orderDetail:null,
+        uid:'',
     }
 
     order = null;
@@ -38,6 +39,7 @@ class DeliveringCard extends React.Component{
         })
 
         var userId = this.orderDetail.userId;
+        this.setState({uid:userId});
 
         firebase.database().ref('users/'+userId).on('value', snapshot=>{
             var userObj = snapshot.val();
@@ -63,13 +65,34 @@ class DeliveringCard extends React.Component{
     }
 
     handleOnPress(){
-        //alert(this.state.orderPathInFirebase);
         this.props.onPress(this.state.orderPathInFirebase, this.state.businessName);
+    }
+
+    DeliveryCompleteSubmit(){
+        // alert(this.state.orderPathInFirebase);
+        Alert.alert(
+            '确认完成送单',
+            '确定订单正确送达？',
+            [
+              {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+              {text: 'OK', onPress: () => {
+                    firebase.database()
+                    .ref(this.state.orderPathInFirebase)
+                    .update({
+                        status:'completed',
+                    }).catch((error)=>{
+                        alert(error);
+                    });
+              }},
+            ],
+            { cancelable: false }
+        )
     }
     
     render(){
         imageSource = this.props.icon;
         text=this.props.text;
+        
 
         const {
             circleRed,
@@ -102,6 +125,7 @@ class DeliveringCard extends React.Component{
                             <Text style={textStyle}>剩余时间：</Text>
                             <Text style={textStyle}>订单简况：</Text>
                         </View>
+                        <Button text='完成' onPress={this.DeliveryCompleteSubmit.bind(this)}/>
                         </View>
                     </View>
                     <View style={{justifyContent:'center'}}>

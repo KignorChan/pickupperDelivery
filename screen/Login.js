@@ -130,6 +130,7 @@ class Login extends Component{
                                 userId: data.user.uid,
                                 userName: username,
                                 phoneNumber: phonenumber,
+                                userType: 'deliveryMan'
                             });
                         }
                     ).catch(
@@ -215,7 +216,11 @@ class Login extends Component{
                 avatarSource: source,
               });
 
-              //this.uploadImage(response.uri);
+            //   this.uploadImage(response.uri).then(()=>{
+            //       alert('Sucess upload!');
+            //   }).catch((error)=>{
+            //       alert(error);
+            //   });
               
 
               console.log('avatarSource'+source.uri);
@@ -223,6 +228,7 @@ class Login extends Component{
           });
     }
 
+    //// need blob tech
     // uploadImage = async(uri) => {
     //     const response = await fetch(uri);
     //     const blob = await response.blob();
@@ -243,6 +249,7 @@ class Login extends Component{
             <Input 
                 autoFocus= {true}
                 placeHolder='请输入用户名' 
+                keyboardType='email-address'
                 value={this.state.email}
                 onChangeText={(email) => this.setState({email:email,loadEmailValidationErrorMessage:null, loadErrorMessage:null})}
             />
@@ -284,6 +291,7 @@ class Login extends Component{
             <Input 
                 autoFocus= {true}
                 placeHolder='请输入邮箱' 
+                keyboardType='email-address'
                 value={this.state.email}
                 onChangeText={(email) => this.setState({email, loadEmailValidationErrorMessage:false})}
             />

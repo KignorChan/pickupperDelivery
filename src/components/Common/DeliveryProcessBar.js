@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-
+import geolib from 'geolib';
 import Geocoder from 'react-native-geocoding';
 
 class DeliveryProcessBar extends React.Component{
@@ -9,16 +9,69 @@ class DeliveryProcessBar extends React.Component{
         meToBusinessDistance: '',
         meToCustomerDistance: '',
         businessAddress:'',
-        customerAddress:''
+        customerAddress:'',
+        userPosition:null,
+        userCurrentCoord:{latitude: 0, longitude: 0},
+        businessCoord: {latitude: 0, longitude: 0}
     }
 
     constructor(props){
         super(props);
-        this.setState({
-            businessAddress:this.props.businessAddress,
-            customerAddress:this.props.customerAddress,
-        });
+        // this.setState({
+        //     businessAddress:this.props.businessAddress,
+        //     customerAddress:this.props.customerAddress,
+        // });
 
+    }
+
+    componentWillMount(){
+        Geocoder.init('AIzaSyBwH9saZIf2zVN8uBgaJ5iABk5E2-sTAvw');
+    }
+
+    //handle some geo calculate
+    getCurrentUserPosition(){
+        navigator.geolocation.getCurrentPosition(
+            (position)=>{
+                console.log('Position'+JSON.stringify(position));
+                this.setState({
+                    userPosition: position,
+                    userCurrentCoord: position.coords,
+                });
+                
+            }
+            ,
+            (error)=>{console.log(error);}
+            ,
+            {
+                enableHighAccuracy:true,
+            }
+        );
+
+    }
+
+    renderMeToBusinessDistance(){
+        const {distanceView}=styles;
+        this.getCurrentUserPosition();
+        //alert(JSON.stringify(this.state.userPosition));
+        // Geocoder.from("Colosseum")
+        // .then(json => {
+        //     var location = json.results[0].geometry.location;
+        //     console.log('Locationsssss'+location);
+        // })
+        // .catch(error => console.warn(error));
+        var distance = geolib.getDistance(
+            {latitude:43.77173745, longitude: -79.26133264244683},   //要改成business位置
+            this.state.userCurrentCoord
+        )
+
+        var distanceInKm = distance/1000;
+        distanceInKm = distanceInKm.toFixed(1);
+
+        //console.log('distancesss'+distanceInKm);
+        return (
+            <Text style={distanceView.textStyle}>{distanceInKm+'km'}</Text>
+        );
+ 
     }
     
 
@@ -46,7 +99,7 @@ class DeliveryProcessBar extends React.Component{
                     <View style={circleRed}><Text style={circleTextstyle}>我</Text></View>
                 </View>
 
-                <View style={distanceView}><Text style={distanceView.textStyle}>16km</Text></View>
+                <View style={distanceView}>{this.renderMeToBusinessDistance()}</View>
                 
                 <View style={circleView}>
                     <View style={circleBlue}><Text style={circleTextstyle}>取</Text></View>

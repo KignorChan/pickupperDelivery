@@ -142,7 +142,7 @@ class DeliveryRequest extends React.Component{
               }},
             ],
             { cancelable: false }
-          )
+        )
     }
 
     meToBusinessDistance(){
@@ -189,7 +189,7 @@ class DeliveryRequest extends React.Component{
                     <TouchableOpacity style={requestViewStyle} onPress={this.handleOnPress.bind(this)}>
                         <View style={firstLineStyle}>
                             <View style={{flex:5}}>
-                                <DeliveryProcessBar/>
+                                <DeliveryProcessBar businessCoord={this.state.businessCoord}/>
 
                             </View>
 
