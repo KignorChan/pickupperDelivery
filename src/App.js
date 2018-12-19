@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, SafeAreaView, ScrollView, Dimensions, AsyncStorage } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, Dimensions, AsyncStorage, Platform, NativeModules, NativeAppEventEmitter } from 'react-native';
 import Mainscreen from '../screen/Main';
 import firebase from 'firebase';
 import Header from './components/Header';
@@ -9,6 +9,14 @@ import Login from '../screen/Login';
 import { Spinner } from './components/Common';
 import DataController from '../model/DataController';
 import { AppProvider } from '../model/AppContext';
+import BackgroundTimer from 'react-native-background-timer';
+
+// const EventEmitter = Platform.select({
+//     ios: () => NativeAppEventEmitter,
+//     android: () => DeviceEventEmitter,
+// })();
+
+const BackgroundTaskManager = NativeModules.BackgroundTaskManager;
 
 class App extends Component{
     state = { 
@@ -18,12 +26,29 @@ class App extends Component{
         uid:'',
         username:'',
         userphonenumber:''
-
      };
 
      orderNmu='';
 
+
+     constructor(props){
+         super(props);
+         this.state={
+             backgroundTaskStatus:'Not Started',
+         }
+     }
+
     componentWillMount(){
+
+        NativeAppEventEmitter.addListener('backgroundProgress', (e)=>{
+            this.setState({backgroundTaskStatus:e.backgroundTaskStatus});
+        });
+
+        NativeAppEventEmitter.emit('backgroundProgress', 'Test');
+
+        BackgroundTaskManager.loadInBackground();
+
+        
 
         firebase.initializeApp(
             {
@@ -36,22 +61,22 @@ class App extends Component{
               }
         );
 
-        firebase.auth().onAuthStateChanged((user)=>{
+        var result = firebase.auth().onAuthStateChanged((user)=>{
             if(user){
                 
                 firebase.database().ref('deliveryMan/'+user.uid).on('value',(snapshot)=>{
                     var deliveryMan = snapshot.val();
-                    this.setState({
-                        uid:deliveryMan.userId,
-                        username:deliveryMan.userName,
-                        userphonenumber: deliveryMan.phoneNumber
-                    });
+                    if(deliveryMan){
+                        this.setState({
+                            uid:deliveryMan.userId,
+                            username:deliveryMan.userName,
+                            userphonenumber: deliveryMan.phoneNumber
+                        });
+                    }
                 });
                 this.setState({
                     loggedIn: true,
                     uid: user.uid,
-                    username:'',
-                    userphonenumber:''
                 });
             }else{
                 this.setState({loggedIn: false});
@@ -90,6 +115,50 @@ class App extends Component{
               
             }
         });
+
+        
+        // BackgroundTimer.start();
+
+        // // listen for event
+        // EventEmitter.addListener('backgroundTimer', () => {
+        //     // this will be executed every 5 seconds
+        //     // even when app is the the background
+        //     console.log('toe');
+        // });
+
+        BackgroundTimer.runBackgroundTimer(() => { 
+            console.log('BACKGROUND CALL');
+            if(this.state.uid){
+                
+                this.updateUserPositionToServer(this.state.uid);
+            }
+            }, 
+            30000);
+    }
+
+    componentDidMount(){
+        
+    }
+
+    componentWillUnmount(){
+        BackgroundTimer.stopBackgroundTimer();
+    }
+
+    //get user position and update to db(firebase)
+    updateUserPositionToServer(userId){
+        navigator.geolocation.getCurrentPosition(
+            (position)=>{
+                console.log('POSITION UPDATED!');
+                firebase.database().ref('deliveryMan/'+userId).update({position})
+            }
+            ,
+            (error)=>{console.log(error);}
+            ,
+            {
+                enableHighAccuracy:true,
+            }
+        );
+
     }
 
     renderContent(){

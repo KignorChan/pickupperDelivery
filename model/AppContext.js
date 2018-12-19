@@ -35,11 +35,14 @@ export class AppProvider extends React.Component{
                 this.setState({email: user.email}) 
                 firebase.database().ref('deliveryMan/'+user.uid).on('value',(snapshot)=>{
                     var deliveryMan = snapshot.val();
-                    this.setState({
-                        uid:deliveryMan.userId,
-                        username:deliveryMan.userName,
-                        userphonenumber: deliveryMan.phoneNumber
-                    });
+                    if(deliveryMan){
+                        this.setState({
+                            uid:deliveryMan.userId,
+                            username:deliveryMan.userName,
+                            userphonenumber: deliveryMan.phoneNumber
+                        });
+                    }
+                    
                 });
             }else{
                 

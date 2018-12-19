@@ -60,7 +60,6 @@ class PersonalCenter extends Component{
                     <PressSession text='Sign out' icon={require('../img/exit.png')} 
                     onPress={this.signOut.bind(this)}/>
                 </View>
-                
             </ScrollView>
         );
     }
