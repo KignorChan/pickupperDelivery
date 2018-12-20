@@ -9,7 +9,7 @@ import Login from '../screen/Login';
 import { Spinner } from './components/Common';
 import DataController from '../model/DataController';
 import { AppProvider } from '../model/AppContext';
-import BackgroundTimer from 'react-native-background-timer';
+//import BackgroundTimer from 'react-native-background-timer';
 
 // const EventEmitter = Platform.select({
 //     ios: () => NativeAppEventEmitter,
@@ -39,17 +39,6 @@ class App extends Component{
      }
 
     componentWillMount(){
-
-        NativeAppEventEmitter.addListener('backgroundProgress', (e)=>{
-            this.setState({backgroundTaskStatus:e.backgroundTaskStatus});
-        });
-
-        NativeAppEventEmitter.emit('backgroundProgress', 'Test');
-
-        BackgroundTaskManager.loadInBackground();
-
-        
-
         firebase.initializeApp(
             {
                 apiKey: "AIzaSyBaBcr9jzqTL4DFidcsDkZ0CcPv1gFfMrE",
@@ -73,6 +62,8 @@ class App extends Component{
                             userphonenumber: deliveryMan.phoneNumber
                         });
                     }
+
+                    BackgroundTaskManager.loadInBackground(user.uid);
                 });
                 this.setState({
                     loggedIn: true,
@@ -116,9 +107,6 @@ class App extends Component{
             }
         });
 
-        
-        // BackgroundTimer.start();
-
         // // listen for event
         // EventEmitter.addListener('backgroundTimer', () => {
         //     // this will be executed every 5 seconds
@@ -126,22 +114,21 @@ class App extends Component{
         //     console.log('toe');
         // });
 
-        BackgroundTimer.runBackgroundTimer(() => { 
-            console.log('BACKGROUND CALL');
-            if(this.state.uid){
+        // BackgroundTimer.runBackgroundTimer(() => { 
+        //     console.log('BACKGROUND CALL');
+        //     if(this.state.uid){
                 
-                this.updateUserPositionToServer(this.state.uid);
-            }
-            }, 
-            30000);
+        //         this.updateUserPositionToServer(this.state.uid);
+        //     }
+        //     }, 
+        //     30000);
     }
 
     componentDidMount(){
-        
     }
 
     componentWillUnmount(){
-        BackgroundTimer.stopBackgroundTimer();
+        BackgroundTaskManager.stopBackground();
     }
 
     //get user position and update to db(firebase)

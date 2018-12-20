@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
-import { Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, Image, TouchableOpacity, ScrollView, NativeModules } from 'react-native';
 import firebase from 'firebase';
 import { createStackNavigator } from 'react-navigation';
 import { PressSession } from '../src/components/Common';
 import PersonalInfoCard from '../src/components/PersonalInfoCard';
 import PersonInfoEdit from './PersonInfoEdit';
+
+const BackgroundTaskManager = NativeModules.BackgroundTaskManager;
 
 class PersonalCenter extends Component{
     state={
@@ -26,6 +28,7 @@ class PersonalCenter extends Component{
 
     signOut(){
         console.log('Sign out');
+        BackgroundTaskManager.stopBackground();
         firebase.auth().signOut();
     }
 

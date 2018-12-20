@@ -23,6 +23,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		140ED2AC1D01E1AD002B40FF /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
 		146834051AC3E58100842450 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 146834041AC3E56700842450 /* libReact.a */; };
+		276E2DCF7258D6588BEC2AB3 /* libPods-pickupperDelivery.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8E0168308DABAF34651AEDD5 /* libPods-pickupperDelivery.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2D02E4C21E0B4AEC006451C7 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157351DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
@@ -58,7 +59,7 @@
 		D71383AD21C04B6500E14780 /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D71383AC21C04B6500E14780 /* Images-2.xcassets */; };
 		D71A097021CAA7A20064ECE3 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D71A096F21CAA7A20064ECE3 /* CoreLocation.framework */; };
 		D71A097421CAA9C60064ECE3 /* BackgroundTaskManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D71A097321CAA9C60064ECE3 /* BackgroundTaskManager.m */; };
-		D7DE004021CAE26E0022277C /* MMLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D7DE003F21CAE26E0022277C /* MMLocationManager.m */; };
+		D7D3D85A21CBFBD9000C006B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D7D3D82F21CBFBD9000C006B /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -397,6 +398,7 @@
 		2D02E4901E0B4A5D006451C7 /* pickupperDelivery-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "pickupperDelivery-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		51220383AA054D11A68BAC2C /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
+		5681DC3AD2AD74C3B23B83A6 /* Pods-pickupperDelivery.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pickupperDelivery.debug.xcconfig"; path = "Pods/Target Support Files/Pods-pickupperDelivery/Pods-pickupperDelivery.debug.xcconfig"; sourceTree = "<group>"; };
 		5786FCF78B504C7A85C6D4CE /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		5D59564FAE83429C9EF7707A /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
@@ -408,17 +410,18 @@
 		84E1CBE304244856B80A26D7 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
 		8C77FBE1FAAD470DB43CF2ED /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		8DF42F2CF14B49BAA29699DE /* RNBackgroundTimer.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNBackgroundTimer.xcodeproj; path = "../node_modules/react-native-background-timer/ios/RNBackgroundTimer.xcodeproj"; sourceTree = "<group>"; };
+		8E0168308DABAF34651AEDD5 /* libPods-pickupperDelivery.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-pickupperDelivery.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		95D2FD081C5A492792F7CD5D /* Foundation.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
 		A359E0A2019C4A77971ABB3F /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		AB6A1454833B412391A32525 /* libRNVectorIcons-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNVectorIcons-tvOS.a"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
+		B73FE1D6F2D412AD3A67D263 /* Pods-pickupperDelivery.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-pickupperDelivery.release.xcconfig"; path = "Pods/Target Support Files/Pods-pickupperDelivery/Pods-pickupperDelivery.release.xcconfig"; sourceTree = "<group>"; };
 		D7034828CEB4492597C60946 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		D71383AC21C04B6500E14780 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-2.xcassets"; path = "pickupperDelivery/Images-2.xcassets"; sourceTree = "<group>"; };
 		D71A096F21CAA7A20064ECE3 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		D71A097221CAA9C60064ECE3 /* BackgroundTaskManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BackgroundTaskManager.h; sourceTree = "<group>"; };
 		D71A097321CAA9C60064ECE3 /* BackgroundTaskManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BackgroundTaskManager.m; sourceTree = "<group>"; };
-		D7DE003E21CAE26E0022277C /* MMLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMLocationManager.h; sourceTree = "<group>"; };
-		D7DE003F21CAE26E0022277C /* MMLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMLocationManager.m; sourceTree = "<group>"; };
+		D7D3D82F21CBFBD9000C006B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D85E41FCD214439D87EA7915 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		DA161783D4464085A8697514 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		EB6E0C14767A42778A2B449A /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
@@ -457,6 +460,7 @@
 				334F3F00B3A042B4B60583BD /* libRNVectorIcons.a in Frameworks */,
 				C6415A3F9101412A83219349 /* libRNImagePicker.a in Frameworks */,
 				86F70A3E49674CEEA52A8B2D /* libRNBackgroundTimer.a in Frameworks */,
+				276E2DCF7258D6588BEC2AB3 /* libPods-pickupperDelivery.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -591,6 +595,7 @@
 		13B07FAE1A68108700A75B9A /* pickupperDelivery */ = {
 			isa = PBXGroup;
 			children = (
+				D7D3D82F21CBFBD9000C006B /* GoogleService-Info.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -600,8 +605,6 @@
 				D71383AC21C04B6500E14780 /* Images-2.xcassets */,
 				D71A097221CAA9C60064ECE3 /* BackgroundTaskManager.h */,
 				D71A097321CAA9C60064ECE3 /* BackgroundTaskManager.m */,
-				D7DE003E21CAE26E0022277C /* MMLocationManager.h */,
-				D7DE003F21CAE26E0022277C /* MMLocationManager.m */,
 			);
 			name = pickupperDelivery;
 			sourceTree = "<group>";
@@ -634,6 +637,7 @@
 			children = (
 				D71A096F21CAA7A20064ECE3 /* CoreLocation.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
+				8E0168308DABAF34651AEDD5 /* libPods-pickupperDelivery.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -697,6 +701,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				070AD43216684EDC8DEA671F /* Resources */,
 				D7DCFC7A21A47732008536AF /* Recovered References */,
+				95FC496BF9659C440E38D341 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -712,6 +717,15 @@
 				2D02E4901E0B4A5D006451C7 /* pickupperDelivery-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		95FC496BF9659C440E38D341 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				5681DC3AD2AD74C3B23B83A6 /* Pods-pickupperDelivery.debug.xcconfig */,
+				B73FE1D6F2D412AD3A67D263 /* Pods-pickupperDelivery.release.xcconfig */,
+			);
+			name = Pods;
 			sourceTree = "<group>";
 		};
 		ADBDB9201DFEBF0600ED6528 /* Products */ = {
@@ -785,6 +799,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "pickupperDelivery" */;
 			buildPhases = (
+				AF8C35B6315F7E13EBBF1F18 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
@@ -1275,6 +1290,7 @@
 				C609CC344964480098487266 /* FontAwesome5_Solid.ttf in Resources */,
 				5CE1D983FB5A44669DC72C76 /* Foundation.ttf in Resources */,
 				65EA4A5FEAD24899A9BCB811 /* Ionicons.ttf in Resources */,
+				D7D3D85A21CBFBD9000C006B /* GoogleService-Info.plist in Resources */,
 				77506171A1B7421398B0CE37 /* MaterialCommunityIcons.ttf in Resources */,
 				0886BBA9933548219270A216 /* MaterialIcons.ttf in Resources */,
 				5593797E353142C481BA88AF /* Octicons.ttf in Resources */,
@@ -1329,6 +1345,24 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
+		AF8C35B6315F7E13EBBF1F18 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-pickupperDelivery-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1344,7 +1378,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D7DE004021CAE26E0022277C /* MMLocationManager.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				D71A097421CAA9C60064ECE3 /* BackgroundTaskManager.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
@@ -1471,6 +1504,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5681DC3AD2AD74C3B23B83A6 /* Pods-pickupperDelivery.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -1500,6 +1534,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B73FE1D6F2D412AD3A67D263 /* Pods-pickupperDelivery.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";

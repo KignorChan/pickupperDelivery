@@ -10,7 +10,11 @@
 #import <dispatch/dispatch.h>
 #import "React/RCTBridgeModule.h"
 
-@interface BackgroundTaskManager : NSObject <RCTBridgeModule>{
-}
+@import Firebase;
+
+@interface BackgroundTaskManager : NSObject <RCTBridgeModule>
+  
+@property (strong, nonatomic) FIRDatabaseReference *ref;
+
 
 @end
