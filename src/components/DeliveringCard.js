@@ -43,12 +43,14 @@ class DeliveringCard extends React.Component{
 
         firebase.database().ref('users/'+userId).on('value', snapshot=>{
             var userObj = snapshot.val();
-            customAddress = userObj.pickupLocation;
-            stripeId = userObj.stripeId;
-            this.setState({
-                customAddress:customAddress,
-            });
 
+            if(userObj){
+                customAddress = userObj.pickupLocation;
+                stripeId = userObj.stripeId;
+                this.setState({
+                    customAddress:customAddress,
+                });
+            }
         });
 
         var storeId = this.orderDetail.storeUid;  
@@ -56,10 +58,12 @@ class DeliveringCard extends React.Component{
         .ref('stores/'+storeId)
         .on('value',snapshot=>{
             var store = snapshot.val();
-            this.setState({
-                businessAddress:store.address,
-                businessName:store.business_name
-            });
+            if(store){
+                this.setState({
+                    businessAddress:store.address,
+                    businessName:store.business_name
+                });
+            }   
         });
 
     }
@@ -106,7 +110,7 @@ class DeliveringCard extends React.Component{
             textStyle
         } = styles;
 
-        if(this.state.orderDetail.status=='delivering'){
+        //if(this.state.orderDetail.status=='delivering'){
             return (
                 <TouchableOpacity style={styles.rootView} onPress={this.handleOnPress.bind(this)}>
                     <View style={{flex:1, padding:10}}>
@@ -125,7 +129,11 @@ class DeliveringCard extends React.Component{
                             <Text style={textStyle}>剩余时间：</Text>
                             <Text style={textStyle}>订单简况：</Text>
                         </View>
-                        <Button text='完成' onPress={this.DeliveryCompleteSubmit.bind(this)}/>
+                        {
+                            this.state.orderDetail.status=='delivering'?
+                            <Button text='完成' onPress={this.DeliveryCompleteSubmit.bind(this)}/>
+                            :null
+                        }
                         </View>
                     </View>
                     <View style={{justifyContent:'center'}}>
@@ -141,9 +149,9 @@ class DeliveringCard extends React.Component{
                 </TouchableOpacity>
             );
 
-        }else{
-            return null;
-        }
+        //}else{
+        //     return null;
+        // }
         
     }
     

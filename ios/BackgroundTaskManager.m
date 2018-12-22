@@ -63,6 +63,8 @@ RCT_EXPORT_METHOD(stopBackground){
   [locationManager startUpdatingLocation];  //requesting location updates
   locationManager.allowsBackgroundLocationUpdates = true;
 
+  NSString* horizontalAccuracy = [NSString stringWithFormat:@"%.8f",locationManager.location.horizontalAccuracy];
+  NSString* verticalAccuracy = [NSString stringWithFormat:@"%.8f",locationManager.location.verticalAccuracy];
 
   NSString* latitude = [NSString stringWithFormat:@"%.8f",locationManager.location.coordinate.latitude];
   NSString* longitude = [NSString stringWithFormat:@"%.8f",locationManager.location.coordinate.longitude];
@@ -77,22 +79,32 @@ RCT_EXPORT_METHOD(stopBackground){
   NSLog(@"Lon: %@", longitude);
   NSLog(@"Alt: %@", altitude);
   NSLog(@"Spd: %@", speed);
+  NSLog(@"horizontalAccuracy: %@", horizontalAccuracy);
+  NSLog(@"verticalAccuracy: %@", verticalAccuracy);
+
   NSLog(@"Time: %@", timestamp);
   
-  NSDictionary *coord = @{
-                             @"accuracy":@"-1",
-                             @"altitude":altitude,
-                             @"latitude":latitude,
-                             @"longitude":longitude,
-                             @"speed":speed,
-                             @"time":timestamp,
-                             };
-  NSLog(@"deliveryId: %@",deliveryManId);
-
-  self.ref = [[FIRDatabase database] reference];
   
-  [[[[self.ref child:@"deliveryMan"] child:deliveryManId] child:@"position"]
-updateChildValues:@{@"coord": coord}];
+  
+  if(timestamp!=NULL){
+    NSDictionary *coord = @{
+                            @"altitude":altitude,
+                            @"latitude":latitude,
+                            @"longitude":longitude,
+                            @"speed":speed,
+                            @"time":timestamp,
+                            @"horizontalAccuracy":horizontalAccuracy,
+                            @"verticalAccuracy":verticalAccuracy,
+                            };
+    NSLog(@"deliveryId: %@",deliveryManId);
+    
+    self.ref = [[FIRDatabase database] reference];
+    
+    [[[[self.ref child:@"deliveryMan"] child:deliveryManId] child:@"position"]
+     updateChildValues:@{@"coord": coord}];
+  }
+  
+
 
 }
 

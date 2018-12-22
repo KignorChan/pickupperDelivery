@@ -56,12 +56,14 @@ class DeliveryRequest extends React.Component{
 
         firebase.database().ref('users/'+userId).on('value', snapshot=>{
             var userObj = snapshot.val();
-            customAddress = userObj.pickupLocation;
-            stripeId = userObj.stripeId;
-            this.setState({
-                customAddress:customAddress,
-            });
 
+            if(userObj){
+                customAddress = userObj.pickupLocation;
+                stripeId = userObj.stripeId;
+                this.setState({
+                    customAddress:customAddress,
+                });
+            }
         });
 
 
@@ -131,7 +133,7 @@ class DeliveryRequest extends React.Component{
                     firebase.database()
                     .ref(this.props.orderPathInFirebase)
                     .update({
-                        status:'delivering',
+                        status:'taking',
                         courierId: uid,
                     }).then(()=>{
                         Alert.alert('取单成功', '去完成你的伟大使命吧！');

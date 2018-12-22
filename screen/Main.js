@@ -47,64 +47,102 @@ class Main extends Component{
         this.orders.push(order);
     }
 
-    componentWillMount(){ 
-        this.orders = [];
-        getData = (snapshot)=>{
+    //componentWillMount(){ 
+        // this.orders = [];
+        // getData = (snapshot)=>{
 
-            const dataObject = snapshot.val() || null;
+        //     const dataObject = snapshot.val() ;
             
-            if (dataObject) {              
-            const keys = Object.keys(dataObject);
+        //     if (dataObject) {              
+        //     const keys = Object.keys(dataObject);
             
-                for(var i=0; i<keys.length; i++){
-                    //console.log('Keys['+i+']: '+keys[i]);
-                    var key = keys[i];
+        //         for(var i=0; i<keys.length; i++){
+        //             //console.log('Keys['+i+']: '+keys[i]);
+        //             var key = keys[i];
                     
-                    var orderSubObject = dataObject[key];
+        //             var orderSubObject = dataObject[key];
                     
-                    var orderSubObjectKeys = Object.keys(orderSubObject);
+        //             var orderSubObjectKeys = Object.keys(orderSubObject);
 
-                    for(var k=0; k<orderSubObjectKeys.length ; k++){
-                        var subKey = orderSubObjectKeys[k];
-                        console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
-                        console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
-                        var orderStatus = orderSubObject[subKey].status;
+        //             for(var k=0; k<orderSubObjectKeys.length ; k++){
+        //                 var subKey = orderSubObjectKeys[k];
+        //                 console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
+        //                 console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
+        //                 var orderStatus = orderSubObject[subKey].status;
 
-                        //order status: 
-                        if(orderStatus != null && orderStatus != ''){
-                            if(orderStatus == 'progressing'){
-                                var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
-                                console.log('orderSubObjectInJson'+orderSubObjectInJson);
+        //                 //order status: 
+        //                 if(orderStatus != null && orderStatus != ''){
+        //                     if(orderStatus == 'progressing'){
+        //                         var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
+        //                         console.log('orderSubObjectInJson'+orderSubObjectInJson);
                             
-                                var order={
-                                        orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
-                                        orderDetail: JSON.parse(orderSubObjectInJson),
-                                    }
+        //                         var order={
+        //                                 orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
+        //                                 orderDetail: JSON.parse(orderSubObjectInJson),
+        //                             }
                             
-                                this.addOrderToArray(order);
+        //                         this.addOrderToArray(order);
 
-                                //alert(this.state.orders.length);
-                                console.log('Testttttaaaa: '+this.orders[0].orderDetail.deliveryFee);
-                                console.log('fffff'+this.orders[0].orderDetail.status);
+        //                         //alert(this.state.orders.length);
+        //                         console.log('Testttttaaaa: '+this.orders[0].orderDetail.deliveryFee);
+        //                         console.log('fffff'+this.orders[0].orderDetail.status);
                                 
-                                this.setState({
-                                    orders: this.orders
-                                })
-                            }
-                        }
-                    }
-                }         
-            }
-        }
+        //                         this.setState({
+        //                             orders: this.orders
+        //                         })
+        //                     }
+        //                 }
+        //             }
+        //         }         
+        //     }
+        // }
 
-        getError = err =>{
-            console.log(err);
-        }
+        
 
-        firebase.database()
-        .ref('/orders/')
-        .on('value', getData, getError);
+        // getError = err =>{
+        //     console.log(err);
+        // }
 
+        // firebase.database()
+        // .ref('/orders/')
+        // .on('value', getData, getError);
+
+    //}
+
+    componentWillMount(){
+        // firebase.auth().onAuthStateChanged((user)=>{
+        //     if(user){
+        //         var userId = user.uid;
+        //         this.setState({
+        //             userId: userId
+        //         }) 
+        console.log("DIDMOUNT: ");
+
+
+                firebase.database().ref('/orders/').on('value', snapshot=>{
+                    var allObjs = snapshot.val();
+                    console.log("OBJECCCCC: "+ JSON.stringify(allObjs));
+
+                    if(allObjs){
+                        var ordersTemp = [];
+                        Object.keys(allObjs).map(firstLvlKey=>{
+                            Object.keys(allObjs[firstLvlKey]).map(secondLvlKey=>{
+                                var orderPathInFirebase = 'orders/'+firstLvlKey+'/'+secondLvlKey;
+                                var order = {
+                                    orderPathInFirebase: orderPathInFirebase,
+                                    orderDetail:allObjs[firstLvlKey][secondLvlKey]
+                                }
+                                console.log("OBJECTTTTT: "+ JSON.stringify(order));
+                                 if(order.orderDetail.status=='progressing'){
+                                    ordersTemp.push(order);
+                                 }
+                            })
+                        });
+                        this.setState({orders:ordersTemp})
+                    } 
+                })
+        //     }
+        // });
     }
 
     componentDidMount(){
@@ -123,27 +161,45 @@ class Main extends Component{
     }
 
     //Render Entire order list
-    renderOrderList(value){
-        var keysArray = [];
+    // renderOrderList(value){
+    //     var keysArray = [];
 
 
-        return this.state.orders.map(order=>{            
-            if(!keysArray.includes(order.orderPathInFirebase)){
-                keysArray.push(order.orderPathInFirebase);
-                console.log('fdsdfsd'+order.orderPathInFirebase);
+    //     return this.state.orders.map(order=>{            
+    //         if(!keysArray.includes(order.orderPathInFirebase)){
+    //             keysArray.push(order.orderPathInFirebase);
+    //             console.log('fdsdfsd'+order.orderPathInFirebase);
 
-                return (
+    //             return (
+    //                 <DeliveryRequest 
+    //                     key={order.orderPathInFirebase} 
+    //                     value={JSON.stringify(order)} 
+    //                     orderPathInFirebase={order.orderPathInFirebase} 
+    //                     onPress={this.returnValueFromCard}
+    //                 />
+                            
+    //             );
+    //         }    
+    //     }    
+    //     )
+    // }
+
+    renderOrderList(){
+        console.log('TYUIUTRER:'+JSON.stringify(this.state.orders));
+
+        return this.state.orders.map(order=>{
+            console.log("FGHFGHFGH"+JSON.stringify(order))
+                console.log("TAKKING!!!");
+                return (            
                     <DeliveryRequest 
                         key={order.orderPathInFirebase} 
                         value={JSON.stringify(order)} 
                         orderPathInFirebase={order.orderPathInFirebase} 
                         onPress={this.returnValueFromCard}
                     />
-                            
                 );
-            }    
-        }    
-        )
+            
+        });
     }
 
     //get the value(orderPathInFirebase) by clicking specific card
@@ -159,26 +215,17 @@ class Main extends Component{
         if(network){
             
         }
-        const styles = {
 
-        }
 
-        return(
-                <AppConsumer>
-                    
-                {(value)=>(
-                    <View style={{flex:1}}>
-                        {this.renderNetworkError()}
-                        <View style={{flex:16, padding:10, backgroundColor:'#F2F2F2'}}>
-                            <ScrollView style={{backgroundColor:'#F2F2F2'}}>
-                                {this.renderOrderList(value.orders)}
-                            </ScrollView>
-                        </View>
-                    </View>
-                    
-                    
-                )}
-                </AppConsumer>
+        return(     
+            <View style={{flex:1}}>
+                {this.renderNetworkError()}
+                <View style={{flex:16, padding:10, backgroundColor:'#F2F2F2'}}>
+                    <ScrollView style={{backgroundColor:'#F2F2F2'}}>
+                        {this.renderOrderList()}
+                    </ScrollView>
+                </View>
+            </View>     
         );        
     }
 }

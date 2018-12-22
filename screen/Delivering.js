@@ -6,6 +6,7 @@ import firebase from 'firebase';
 import { AppConsumer } from '../model/AppContext';
 import DeliveryRequest from '../src/components/DeliveryRequest'; 
 import OrderDetail from './OrderDetail';
+import ScrollableTabView, {DefaultTabBar, } from 'react-native-scrollable-tab-view';
 
 
 //import DeliveryRequest from '../src/components/DeliveryRequest'; 
@@ -43,6 +44,9 @@ class Delivering extends Component{
     }
 
     componentWillMount(){
+    }
+
+    componentDidMount(){
         firebase.auth().onAuthStateChanged((user)=>{
             if(user){
                 var userId = user.uid;
@@ -50,79 +54,65 @@ class Delivering extends Component{
                     userId: userId
                 }) 
 
-                //get the delivering orders for this user
-                getData = (snapshot)=>{
-
-                    const dataObject = snapshot.val() || null;
-                    
-                    if (dataObject) {              
-                    const keys = Object.keys(dataObject);
-                    
-                        for(var i=0; i<keys.length; i++){
-                            //console.log('Keys['+i+']: '+keys[i]);
-                            var key = keys[i];
-                            
-                            var orderSubObject = dataObject[key];
-                            
-                            var orderSubObjectKeys = Object.keys(orderSubObject);
-        
-                            for(var k=0; k<orderSubObjectKeys.length ; k++){
-                                var subKey = orderSubObjectKeys[k];
-                                console.log('subOrderKey['+i+']['+k+']'+subKey);    //get all suborder keys for now
-                                console.log('subOrderKey['+i+']['+k+'] status: ' +orderSubObject[subKey].status);
-                                var orderStatus = orderSubObject[subKey].status;
-                                var courierId = orderSubObject[subKey].courierId? orderSubObject[subKey].courierId : '';
-
-                                //alert(courierId);
-
-                                //order status: 
-                                if(orderStatus != null && orderStatus != ''){
-                                    if(orderStatus == 'delivering' && courierId == this.state.userId){
-                                        var orderSubObjectInJson = JSON.stringify(orderSubObject[subKey]);
-                                        console.log('orderSubObjectInJson'+orderSubObjectInJson);
-                                    
-                                        var order={
-                                                orderPathInFirebase: snapshot.key +'/'+ key +'/'+ subKey,
-                                                orderDetail: JSON.parse(orderSubObjectInJson),
-                                            }
-                                    
-                                        this.addOrderToArray(order);
-        
-                                        //alert(this.state.orders.length);
-                                        //this.setState({dataSource: ds.cloneWithRows(JSON.stringify(this.orders))})
-                                        console.log('lllll'+JSON.stringify(this.orders));
-                                        console.log('ggggg '+ this.orders[0].orderDetail.status);
-                                        this.setState({
-                                            orders: this.orders
-                                        })
-                                    }
-                                }
+                firebase.database().ref('/orders/').on('value', snapshot=>{
+                    var allObjs = snapshot.val();
+                    var ordersTemp = [];
+                    Object.keys(allObjs).map(firstLvlKey=>{
+                        Object.keys(allObjs[firstLvlKey]).map(secondLvlKey=>{
+                            var orderPathInFirebase = 'orders/'+firstLvlKey+'/'+secondLvlKey;
+                            var order = {
+                                orderPathInFirebase: orderPathInFirebase,
+                                orderDetail:allObjs[firstLvlKey][secondLvlKey]
                             }
-                        }         
-                    }
-                }
-        
-                getError = err =>{
-                    console.log(err);
-                }
-        
-                firebase.database()
-                .ref('/orders/')
-                .on('value', getData, getError);
-
+                            console.log("OBJECTTTTT: "+ JSON.stringify(order));
+                            if(order.orderDetail.courierId==userId){
+                                ordersTemp.push(order);
+                            }
+                        })
+                    });
+                    this.setState({orders:ordersTemp})
+                })
             }
         });
     }
 
-    renderDeliveryCards(orders){
-        var keysArray = [];
+
+    renderDeliveryCardsTaking(){
+
+        console.log('TYUIUTRER:'+JSON.stringify(this.state.orders));
 
         return this.state.orders.map(order=>{
-            if(!keysArray.includes(order.orderPathInFirebase)){
-                keysArray.push(order.orderPathInFirebase);
-                console.log('fdsdfsd'+order.orderPathInFirebase);
-               // alert(order.orderPathInFirebase)
+            console.log("FGHFGHFGH"+JSON.stringify(order))
+            if(order.orderDetail.status=='taking'){
+                console.log("TAKKING!!!");
+                return (            
+                    <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} onPress={this.returnValueFromCard}/>
+                );
+            }
+        });
+    }
 
+    renderDeliveryCardsDelivering(){
+        console.log('TYUIUTRER:'+JSON.stringify(this.state.orders));
+
+        return this.state.orders.map(order=>{
+            console.log("FGHFGHFGH"+JSON.stringify(order))
+            if(order.orderDetail.status=='delivering'){
+                console.log("TAKKING!!!");
+                return (            
+                    <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} onPress={this.returnValueFromCard}/>
+                );
+            }
+        });
+    }
+
+    renderDeliveryCardsCompleted(){
+        console.log('TYUIUTRER:'+JSON.stringify(this.state.orders));
+
+        return this.state.orders.map(order=>{
+            console.log("FGHFGHFGH"+JSON.stringify(order))
+            if(order.orderDetail.status=='completed'){
+                console.log("TAKKING!!!");
                 return (            
                     <DeliveringCard key={order.orderPathInFirebase} value={JSON.stringify(order)} orderPathInFirebase={order.orderPathInFirebase} onPress={this.returnValueFromCard}/>
                 );
@@ -137,12 +127,43 @@ class Delivering extends Component{
     }
     
     
-    render(props){
+    render(){
         return (
             <View style={{flex:1, backgroundColor:'#F2F2F2'}}>
-                <ScrollView>
-                    {this.renderDeliveryCards(this.orders)}
-                </ScrollView>
+                
+                <ScrollableTabView
+                    style={{backgroundColor:'#f2f2f2',marginTop:10, }}
+                    initialPage={0}
+                    renderTabBar={() => <DefaultTabBar />}
+                    onChangeTab={(obj) => {
+                        //console.log('index:' + obj.i);
+                        //this._goToProfile(obj)
+                        }
+                }>
+                    <View tabLabel='取单' style={{flex:1}}>
+                    {this.orders?
+                        <ScrollView>
+                            {this.renderDeliveryCardsTaking()}
+                        </ScrollView>:null
+                    }
+                    </View>
+                    <View tabLabel='送单'>
+                    {this.orders?
+                        <ScrollView>
+                            {this.renderDeliveryCardsDelivering()}
+                        </ScrollView>:null
+                    }
+                    </View>
+                    <View tabLabel='完成'>
+                    {this.orders?
+                        <ScrollView>
+                            {this.renderDeliveryCardsCompleted()}
+                        </ScrollView>:null
+                    }
+                    </View>
+                
+                </ScrollableTabView>
+                
             </View>
         );
     }
