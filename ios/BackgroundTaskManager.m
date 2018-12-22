@@ -37,7 +37,7 @@ RCT_EXPORT_METHOD(loadInBackground:(NSString*)deliveryId){
       
       [self.bridge.eventDispatcher sendAppEventWithName:@"backgroundProgress" body:@{@"status": @"done"}];
       [TimeOfActiveUser invalidate];
-      TimeOfActiveUser = [NSTimer scheduledTimerWithTimeInterval:4.0 target:self selector:@selector(actionTimer) userInfo:nil repeats:YES];
+      TimeOfActiveUser = [NSTimer scheduledTimerWithTimeInterval:20.0 target:self selector:@selector(actionTimer) userInfo:nil repeats:YES];
       [[NSRunLoop mainRunLoop] addTimer:TimeOfActiveUser forMode:NSDefaultRunLoopMode];
     });
   });
